@@ -253,12 +253,11 @@ def do_search_notes():
     for fav in dao.get_notes():
         count += 1
         show_verse(fav[1])
-    BasicTui.DisplayTitle(f'There are {count} Notes.') 
+    BasicTui.DisplayTitle(f'There are {count} Notes.')
 
-if __name__ == '__main__':
-##    from admin_ops import cleanup, create_tables
-##    create_tables()
-##    cleanup()
+
+def mainloop():
+    ''' Core and functions. '''
     b81 = True
     options = [
         ("b", "List Books", do_list_books),
@@ -270,7 +269,14 @@ if __name__ == '__main__':
         ("*", "Stars", do_search_stars),
         ("q", "Quit", dum)
     ]
-    BasicTui.ClearScreen()
     BasicTui.SetTitle('The Stick of Joseph')
     do_func("Main Menu: ", options, ' ')
     BasicTui.Display(".")
+    
+
+if __name__ == '__main__':
+##    from admin_ops import cleanup, create_tables
+##    create_tables()
+##    cleanup()
+    BasicTui.ClearScreen()
+    mainloop()
