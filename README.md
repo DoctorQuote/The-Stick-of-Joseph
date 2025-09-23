@@ -1,6 +1,21 @@
 # The-Stick-of-Joseph
 Ancient Prophecy designed for Our Times
 
+## Foreword
+Pure religion has nothing to do with me controlling you - it has to do with God, controlling me. 
+
+Adam, after all, was permitted to do whatever she did.
+
+By their fruit, shall ye know them?
+
+So I make no apologies for the fact that I - like billions of others - get a great feeling when I read the scriptures. 
+
+Indeed, in order to share the warm-and-fuzzy feelings with any who might be able to experience the same, I have learned many technologies. 
+
+Here is where I share "The Stick of Joseph" (a.k.a. "The 81 Books of Terror" :^)
+
+Sharing is caring?
+
 ## Universal User Interface
 The Stick of Joseph is forever a console user interface.
 
