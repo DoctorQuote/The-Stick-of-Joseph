@@ -4,7 +4,7 @@ Ancient Prophecy designed for Our Times - now available using [pip install Bible
 The [video](https://youtu.be/4KU9m4emCo4?si=fW_7R4hjbsmY4JNO) shows how to use the program.
 
 ## Foreword
-Pure religion has nothing to do with me controlling you - it has to do with God, controlling me. 
+Pure religion has nothing to do with me controlling you - it has to do with God, controlling me. (Romans 13:7 / #28274)
 
 Adam, after all, was permitted to do whatever she did.
 
