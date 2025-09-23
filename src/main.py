@@ -274,5 +274,6 @@ def mainloop():
     BasicTui.SetTitle('The Stick of Joseph')
     do_func("Main Menu: ", options, ' ')
     BasicTui.Display(".")
+    exit(0)
     
 
