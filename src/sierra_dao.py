@@ -4,14 +4,10 @@ File: sierra_dao.py
 Problem Domain: Database / DAO
 Status: PRODUCTION / STABLE
 Revision: 1.5.1
-
-Source: 
-https://github.com/DoctorQuote/TheBibleProjects
-
 '''
 import sys
 import sqlite3
-from tui import BasicTui
+from bible9000.tui import BasicTui
 
 
 class SierraDAO:
@@ -108,14 +104,17 @@ WHERE (B.ID=BookID) AND BOOK LIKE '%{book}%' AND BookChapterID='{chapt}' AND Boo
     @staticmethod
     def GetNotes(sierra:int):
         ''' get notes for verse '''
-        from sierra_notes import SqlNote
+        from bible9000.sierra_notes import SqlNote
         dao = GetDAO(True)
         for row in dao.search_notes(sierra):
             yield row
    
     @staticmethod
-    def GetDAO(bSaints=False, database="./biblia.sqlt3"):
+    def GetDAO(bSaints=False, database=None):
         ''' Connect to the database & return the DAO '''
+        if not database:
+            from bible9000.admin_ops import get_database
+            database = get_database()
         conn = sqlite3.connect(database)
         # conn.row_factory = dict_factory
         curs = conn.cursor()
@@ -152,7 +151,7 @@ WHERE (B.ID=BookID) AND BOOK LIKE '%{book}%' AND BookChapterID='{chapt}' AND Boo
                 
 if __name__ == "__main__":
     ''' Ye Olde Testing '''
-    from tui import BasicTui
+    from bible9000.tui import BasicTui
     rows = SierraDAO.ListBooks(True)
     if len(list(rows)) != 81:
         BasicTui.DisplayError("Testing Failure - No Books?")

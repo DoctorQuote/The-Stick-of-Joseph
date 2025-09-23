@@ -12,16 +12,19 @@ using every operating system where Python is available.
 
 NEXUS
 ----- 
-https://github.com/DoctorQuote/TheBibleProjects
+Installer: https://pypi.org/project/Bible9000/
+Project:   https://github.com/DoctorQuote/The-Stick-of-Joseph
+Website:   https://mightymaxims.com/
 '''
 
 b81 = True
 
-import argparse
-from sierra_dao  import SierraDAO
-from sierra_note import NoteDAO
-from sierra_fav  import FavDAO
-from tui import BasicTui
+import sys
+sys.path.append('..')
+from bible9000.sierra_dao  import SierraDAO
+from bible9000.sierra_note import NoteDAO
+from bible9000.sierra_fav  import FavDAO
+from bible9000.tui import BasicTui
 
 def dum():
     BasicTui.Display('(done)')
@@ -158,7 +161,6 @@ def edit_notes(sierra):
 
 
 def make_note(sierra):
-    from sierra_note import NoteDAO
     sierra = int(sierra)
     BasicTui.Display("Use .edit. to fix notes")
     notes = BasicTui.Input('Notes: ').strip()
@@ -274,9 +276,3 @@ def mainloop():
     BasicTui.Display(".")
     
 
-if __name__ == '__main__':
-##    from admin_ops import cleanup, create_tables
-##    create_tables()
-##    cleanup()
-    BasicTui.ClearScreen()
-    mainloop()

@@ -1,8 +1,8 @@
 #! /usr/bin/env python3
 # Status: Testing Success.
 import sqlite3
-from tui import BasicTui
-from sierra_dao import SierraDAO
+from bible9000.tui import BasicTui
+from bible9000.sierra_dao import SierraDAO
 
 class NoteDAO():
     ''' Manage the NoteDAOs Table '''
@@ -24,8 +24,11 @@ class NoteDAO():
         return text.replace("''",'"')
     
     @staticmethod
-    def GetDAO(bSaints=False, database="./biblia.sqlt3"):
+    def GetDAO(bSaints=False, database=None):
         ''' Connect to the database & return the DAO '''
+        if not database:
+            from bible9000.admin_ops import get_database
+            database = get_database()
         result = NoteDAO()
         result.dao = SierraDAO.GetDAO(bSaints, database)
         return result
@@ -84,7 +87,7 @@ if __name__ == '__main__':
         os.unlink(testdb)
     if os.path.exists(testdb):
         raise Exception(f'Unable to remove "{testdb}"?')
-    from admin_ops import tables
+    from bible9000.admin_ops import tables
     db = NoteDAO.GetDAO(True, testdb)
     db.dao.conn.execute(tables['SqlNotes'])
     tests = [

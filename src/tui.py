@@ -1,4 +1,4 @@
-from pannel import Panel
+from bible9000.pannel import Panel
 lwrap = Panel()
 
 class BasicTui:
@@ -42,7 +42,7 @@ class BasicTui:
         ''' Displays the books. Saint = superset. Returns number
             of books displayed to permit selections of same.
         '''
-        from sierra_dao import SierraDAO
+        from bible9000.sierra_dao import SierraDAO
         for ss, book in enumerate(SierraDAO.ListBooks(bSaints),1):
             if(ss % 3) == 0:
                 print(f"{ss:02}.) {book['book']:<18}")
@@ -70,8 +70,8 @@ class BasicTui:
     @staticmethod
     def DisplayVerse(row:dict)->bool:
         ''' Common display for all verses. '''
-        from sierra_note import NoteDAO
-        from sierra_fav  import FavDAO
+        from bible9000.sierra_note import NoteDAO
+        from bible9000.sierra_fav  import FavDAO
         if not row:
             print('[null]')
             return False

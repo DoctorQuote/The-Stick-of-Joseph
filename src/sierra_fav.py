@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 # Status: Testing Success.
 import sqlite3
-from tui import BasicTui
-from sierra_dao import SierraDAO
+from bible9000.tui import BasicTui
+from bible9000.sierra_dao import SierraDAO
 
 class FavDAO():
     ''' Manage the Fav Table '''
@@ -10,12 +10,15 @@ class FavDAO():
         pass
 
     @staticmethod
-    def GetDAO(bSaints=False, database="./biblia.sqlt3"):
+    def GetDAO(bSaints=False, database=None):
         ''' Connect to the database & return the DAO '''
+        if not database:
+            from bible9000.admin_ops import get_database
+            database = get_database()
         result = FavDAO()
         result.dao = SierraDAO.GetDAO(bSaints, database)
         return result
-
+    
     def toggle_fav(self, sierra:int)->bool:
         if self.is_fav(sierra):
             cmd = f'DELETE From SqlFav WHERE item = {sierra};'
@@ -51,7 +54,7 @@ if __name__ == '__main__':
         os.unlink(testdb)
     if os.path.exists(testdb):
         raise Exception(f'Unable to remove "{testdb}"?')
-    from admin_ops import tables
+    from bible9000.admin_ops import tables
     db = FavDAO.GetDAO(True, testdb)
     db.dao.conn.execute(tables['SqlFav'])
     tests = [

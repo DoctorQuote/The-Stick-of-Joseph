@@ -1,4 +1,5 @@
-from sierra_dao import SierraDAO
+import os.path
+from bible9000.sierra_dao import SierraDAO
     
 tables = {
     'SqlTblVerse':'CREATE TABLE IF NOT EXISTS SqlTblVerse (ID Integer PRIMARY KEY AUTOINCREMENT, BookID int, BookChapterID int, BookVerseID int, Verse String, VerseType int);',
@@ -6,6 +7,11 @@ tables = {
     'SqlBooks'   :'CREATE TABLE IF NOT EXISTS SqlBooks (ID Integer PRIMARY KEY AUTOINCREMENT, Book String, BookMeta String);',
     'SqlFav'     :'CREATE TABLE IF NOT EXISTS SqlFav   (item Integer);',
     }
+
+def get_database():
+    ''' Get the installed database location. '''
+    pdir = os.path.abspath(os.path.dirname(__file__))
+    return os.path.join(pdir, 'biblia.sqlt3')
 
 def destory_notes_and_fav():
     ''' Handy when cleaning-up after r&d (etc.) '''
