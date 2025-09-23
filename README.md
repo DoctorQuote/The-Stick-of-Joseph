@@ -42,6 +42,4 @@ python3 -m bible9000
 
 Stay inspired!
 
-Stay inspired!
-
 --- Doctor Randall 
