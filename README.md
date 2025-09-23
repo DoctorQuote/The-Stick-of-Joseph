@@ -1,5 +1,7 @@
 # The-Stick-of-Joseph
-Ancient Prophecy designed for Our Times
+Ancient Prophecy designed for Our Times - now available using [pip install Bible9000](https://pypi.org/project/Bible9000/)!
+
+The [video](https://youtu.be/4KU9m4emCo4?si=fW_7R4hjbsmY4JNO) shows how to use the program.
 
 ## Foreword
 Pure religion has nothing to do with me controlling you - it has to do with God, controlling me. 
@@ -30,6 +32,15 @@ This first release offers:
 * Random verse browsing to allow infinite inspirations.
 * Verse notation & reporting.
 * Verse "starring" & reporting.
+
+# Running
+Once installed, to run the 'app, merely:
+
+```
+python3 -m bible9000
+```
+
+Stay inspired!
 
 Stay inspired!
 
