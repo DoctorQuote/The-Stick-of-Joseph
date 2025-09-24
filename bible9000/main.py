@@ -2,9 +2,13 @@
 '''
 File: main.py
 Problem Domain: Console Application
-Status: Production
-Revision: 1.0.0
+'''
 
+STATUS  = "Research"
+VERSION = "2.0.0"
+MAX_FIND = 40 # When to enter 'tally only' mode
+
+'''
 MISSION
 =======
 Create a simple way to read & collect your favorite passages
@@ -26,6 +30,8 @@ from bible9000.sierra_note import NoteDAO
 from bible9000.sierra_fav  import FavDAO
 from bible9000.tui import BasicTui
 
+BOOKS    = SierraDAO.GetTestaments()
+
 def dum():
     BasicTui.Display('(done)')
 
@@ -34,7 +40,7 @@ def do_func(prompt, options, level):
     '''Menued operations. '''
     choice = None
     while choice != options[-1][0]:
-        BasicTui.Display(level * 15)
+        BasicTui.DisplayTitle(level)
         for o in options:
             BasicTui.Display(o[0], o[1])
         choice = BasicTui.Input(prompt)
@@ -50,30 +56,65 @@ def do_func(prompt, options, level):
 
 def do_search_books():
     ''' Search books & read from results. '''
-    BasicTui.Display("Example: +word -word")
-    BasicTui.Display("Enter q to quit")
-    inc = ''; count = 0
-    words = BasicTui.Input("+/-words: ")
-    for word in words.strip().split(' '):
-        if not word or word == 'q':
-            return
-        if inc:
-            inc += ' AND '
-        if word[0] == '-':
-            inc += f'VERSE NOT LIKE "%{word[1:]}%"'
-            count += 1
-        if word[0] == '+':
-            inc += f'VERSE LIKE "%{word[1:]}%"'
-            count += 1
-    if not count:
-        return
-    dao = SierraDAO.GetDAO(b81)
-    BasicTui.Display(inc)
-    sigma = 0
-    for row in dao.search(inc):
-        sigma += 1
-        BasicTui.DisplayVerse(row)
-    BasicTui.DisplayTitle(f"Found {sigma} Verses")
+    while True:
+        yikes = False # search overflow
+        BasicTui.Display("Example: +word -word, -a")
+        BasicTui.Display("Enter q to quit")
+        inc = ''; count = 0; exbook = {}
+        words = BasicTui.Input("?, +w, -w, q: ")
+        cols = words.strip().split(' ')
+        for word in cols:
+            if not word or word == 'q':
+                return
+            if word == '?':
+                BasicTui.DisplayHelp("?  = help",
+                    "+w = include word",
+                    "-w = exclude word",
+                    "-o = exclude testament, old",
+                    "-n = exclude testament, new",
+                    "-a = exclude testament, another")
+                break
+            if word in ['-o', '-n', '-a']:
+                exbook[word[1]] = 0
+                continue
+            if inc:
+                inc += ' AND '
+            if word[0] == '-':
+                inc += f'VERSE NOT LIKE "%{word[1:]}%"'
+                count += 1
+            if word[0] == '+':
+                inc += f'VERSE LIKE "%{word[1:]}%"'
+                count += 1
+        if not count:
+            continue
+        dao = SierraDAO.GetDAO(b81)
+        sigma = 0
+        for row in dao.search(inc):
+            if exbook:
+                _id = row['book']
+                if 'o' in exbook:
+                    if BOOKS['ot'].count(_id): 
+                        exbook['o'] += 1
+                        continue
+                if 'n' in exbook:
+                    if BOOKS['nt'].count(_id): 
+                        exbook['n'] += 1
+                        continue
+                if 'a' in exbook:
+                    if BOOKS['bom'].count(_id): 
+                        exbook['a'] += 1
+                        continue
+                sigma += 1
+                if sigma == MAX_FIND:
+                    yikes = True
+                    BasicTui.DisplayError(f"Results >= {MAX_FIND} ...")
+                if not yikes:
+                    BasicTui.DisplayVerse(row)
+        if exbook:
+            BasicTui.DisplayTitle("Omissions")
+            for key in exbook:
+                BasicTui.Display(f'{key} has {exbook[key]} matches.')
+        BasicTui.DisplayTitle(f"Displayed {sigma} Verses")
 
 
 def do_list_books():
@@ -197,13 +238,12 @@ def browse_from(sierra)->int:
         try:
             o = option[0]
             if o == '?':
-                BasicTui.DisplayTitle('HELP')
-                BasicTui.Display('? = help')
-                BasicTui.Display('* = toggle star')
-                BasicTui.Display('@ = manage notes')
-                BasicTui.Display('n = next page')
-                BasicTui.Display('p = last page')
-                BasicTui.Display('q = quit')
+                BasicTui.DisplayHelp('? = help',
+                '* = toggle star',
+                '@ = manage notes',
+                'n = next page',
+                'p = last page',
+                'q = quit')
                 continue
             if o == '*':
                 BasicTui.DisplayTitle('STAR')
@@ -272,8 +312,7 @@ def mainloop():
         ("q", "Quit", dum)
     ]
     BasicTui.SetTitle('The Stick of Joseph')
-    do_func("Main Menu: ", options, ' ')
+    BasicTui.Display(STATUS, 'Version', VERSION)
+    do_func("Main Menu: ", options, '# Main Menu')
     BasicTui.Display(".")
-    exit(0)
     
-

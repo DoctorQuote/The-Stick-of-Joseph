@@ -12,7 +12,7 @@ class BasicTui:
 
     @staticmethod
     def IsAnsi():
-        ''' Best-guess to see if we'lwrape ANSI colors. '''
+        ''' Best-guess to see if we've ANSI colors. '''
         import sys
         if sys.platform == 'win32':
             return False
@@ -36,6 +36,12 @@ class BasicTui:
         for zline in lwrap.wrap(title.strip()):
             print(zline)
         print(lwrap.wrap(char * lwrap._wrap.width)[0])
+
+    @staticmethod
+    def DisplayHelp(*args):
+        BasicTui.DisplayTitle("> HELP", "?")
+        for line in args:
+            print(line)
         
     @staticmethod
     def DisplayBooks(bSaints=True):
@@ -109,18 +115,4 @@ class BasicTui:
         print(lwrap.center(' Sierra Bible #{0} '.format(
             row['sierra']), '='))
         return True
-   
-    @staticmethod
-    def DisplayVerseO(row:dict)->bool:
-        ''' Common display for all verses. '''
-        if not row:
-            print('[null]')
-            return False
-        line = row['text']
-        print(lwrap.center(' {0} {1}:{2} '.format(
-            row['book'],row['chapter'],row['verse']), '='))
-        for zline in lwrap.wrap(line.strip()):
-            print(zline)
-        print(lwrap.center(' Sierra Bible #{0} '.format(
-            row['sierra']), '='))
-        return True
+

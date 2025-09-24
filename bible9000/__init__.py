@@ -9,5 +9,7 @@ try:
     sys.path.append('..')
     from bible9000.main import mainloop
     mainloop()
-except:
+except Exception as ex:
+    print(ex)
     print('Beware the wumpus.')
+#exit(0)

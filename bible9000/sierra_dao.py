@@ -3,7 +3,7 @@
 File: sierra_dao.py
 Problem Domain: Database / DAO
 Status: PRODUCTION / STABLE
-Revision: 1.5.1
+Revision: 1.5.2
 '''
 import sys
 import sqlite3
@@ -122,6 +122,22 @@ WHERE (B.ID=BookID) AND BOOK LIKE '%{book}%' AND BookChapterID='{chapt}' AND Boo
         dao.database = database
         return dao
 
+    @staticmethod
+    def GetTestaments()->dict():
+        ''' Get the book names in the 'nt' 'ot' and 'bom'. '''
+        results = dict()
+        dao = SierraDAO.GetDAO(True)
+        if not dao:
+            return results
+        cmd = 'SELECT Book From SqlBooks ORDER BY ID;'
+        res = dao.conn.execute(cmd)
+        for row in res:
+            cols = row[0].split('.')
+            book = cols[1]
+            if not book in results:
+                results[book] = []
+            results[book].append(cols[2])
+        return results
     
     @staticmethod
     def ListBooks(bSaints=False) -> list():
