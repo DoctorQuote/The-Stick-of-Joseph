@@ -4,8 +4,8 @@ File: main.py
 Problem Domain: Console Application
 '''
 
-STATUS  = "Research"
-VERSION = "2.0.0"
+STATUS   = "Research"
+VERSION  = "2.0.0"
 MAX_FIND = 40 # When to enter 'tally only' mode
 
 '''
@@ -29,6 +29,7 @@ from bible9000.sierra_dao  import SierraDAO
 from bible9000.sierra_note import NoteDAO
 from bible9000.sierra_fav  import FavDAO
 from bible9000.tui import BasicTui
+from bible9000.words import WordList
 
 BOOKS    = SierraDAO.GetTestaments()
 
@@ -173,12 +174,21 @@ def do_classic_reader():
         BasicTui.DisplayError(ex)
 
 
+def edit_subjects(sierra):
+    sierra = int(sierra)
+    notes = []
+    dao = NoteDAO.GetDAO(b81)
+    for ss, note in enumerate(dao.subjects_for(sierra),1):
+        pass
+
+
+
 def edit_notes(sierra):
     sierra = int(sierra)
     notes = []
     dao = NoteDAO.GetDAO(b81)
     for ss, note in enumerate(dao.notes_for(sierra),1):
-        line = f'{ss}.) {note[5]}'
+        line = f'{ss}.) {note.Notes}'
         BasicTui.Display(line)
         notes.append(note)
     try:
@@ -189,19 +199,21 @@ def edit_notes(sierra):
         if not znote:
             ok = BasicTui.Input('Delete Note (N/y) ?').strip()
             if ok and ok.lower()[0] == 'y':
-                print('okeeeee')
-                dao.delete_note(notes[inum][0])
+                row = notes[inum]
+                dao.delete_note(row)
                 BasicTui.Display('Note deleted.')
                 return
             else:
                 raise Exception()
-        dao.update_note(notes[inum][0], znote)
+        row = notes[inum]
+        row.Notes = znote
+        dao.update_note(row)
         BasicTui.Display('Note updated.')
     except:
         BasicTui.Display('done')
 
 
-def make_note(sierra):
+def manage_notes(sierra):
     sierra = int(sierra)
     BasicTui.Display("Use .edit. to fix notes")
     notes = BasicTui.Input('Notes: ').strip()
@@ -212,7 +224,10 @@ def make_note(sierra):
         edit_notes(sierra)
         return
     dao = NoteDAO.GetDAO(b81)
-    dao.insert_note(sierra, notes)
+    row = NoteDAO()
+    row.vStart = sierra
+    row.Notes = notes
+    dao.insert_note(row)
     BasicTui.Display(f"Note added for {sierra}.")
     
     
@@ -256,7 +271,7 @@ def browse_from(sierra)->int:
                 continue
             if o == '@':
                 BasicTui.DisplayTitle('NOTE')
-                make_note(sierra)
+                manage_notes(sierra)
                 continue
             elif o == 'p':
                 if sierra == 1:
@@ -294,12 +309,13 @@ def do_search_notes():
     count = 0
     for fav in dao.get_notes():
         count += 1
-        show_verse(fav[1])
+        show_verse(fav.vStart)
     BasicTui.DisplayTitle(f'There are {count} Notes.')
 
 
+
 def mainloop():
-    ''' Core and functions. '''
+    ''' TUI features and functions. '''   
     b81 = True
     options = [
         ("b", "List Books", do_list_books),
@@ -316,3 +332,5 @@ def mainloop():
     do_func("Main Menu: ", options, '# Main Menu')
     BasicTui.Display(".")
     
+if __name__ == '__main__':
+    mainloop()

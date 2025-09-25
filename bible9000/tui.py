@@ -26,9 +26,17 @@ class BasicTui:
     
     @staticmethod
     def Input(prompt:str)->str:
-        ''' Great for testing. '''
+        ''' Great for regressive testing. '''
         return input(prompt)
-
+    
+    @staticmethod
+    def InputNumber(prompt:str, default=-1)->str:
+        ''' Get a number. Return the default on error. '''
+        try:
+            return int(BasicTui.Input(prompt))
+        except:
+            return default
+    
     @staticmethod
     def DisplayTitle(title:str, char='*'):
         ''' Common UI. '''
@@ -71,7 +79,6 @@ class BasicTui:
         for zline in lwrap.wrap(line.strip()):
             print(zline)
         return True
-
    
     @staticmethod
     def DisplayVerse(row:dict)->bool:
@@ -94,7 +101,7 @@ class BasicTui:
             right.append(*lwrap.wrap('* Starred *'))
         dao = NoteDAO.GetDAO(True)
         for note in dao.notes_for(row['sierra']):
-            for zline in lwrap.wrap(note[5].strip()):
+            for zline in lwrap.wrap(note.Notes.strip()):
                 right.append(zline)
         ll=len(left);lr = len(right)
         if not lr:
