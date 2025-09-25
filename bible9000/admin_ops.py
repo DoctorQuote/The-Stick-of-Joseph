@@ -1,5 +1,9 @@
-import os.path
+import os, os.path
+import sys
+if '..' not in sys.path:
+    sys.path.append('..')
 from bible9000.sierra_dao import SierraDAO
+from bible9000.tui        import BasicTui
     
 tables = {
     'SqlTblVerse':'CREATE TABLE IF NOT EXISTS SqlTblVerse (ID Integer PRIMARY KEY AUTOINCREMENT, BookID int, BookChapterID int, BookVerseID int, Verse String, VerseType int);',
@@ -7,6 +11,22 @@ tables = {
     'SqlBooks'   :'CREATE TABLE IF NOT EXISTS SqlBooks (ID Integer PRIMARY KEY AUTOINCREMENT, Book String, BookMeta String);',
     'SqlFav'     :'CREATE TABLE IF NOT EXISTS SqlFav   (item Integer);',
     }
+    
+
+def do_data_export():
+    BasicTui.DisplayTitle("work in progress.")
+
+def do_data_import():
+    BasicTui.DisplayTitle("work in progress.")
+
+def do_report_html():
+    BasicTui.DisplayTitle("work in progress.")
+
+def do_data_dump():
+    BasicTui.DisplayTitle("work in progress.")
+
+def do_data_restore():
+    BasicTui.DisplayTitle("work in progress.")
 
 def get_database():
     ''' Get the installed database location. '''

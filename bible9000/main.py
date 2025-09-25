@@ -5,7 +5,7 @@ Problem Domain: Console Application
 '''
 
 STATUS   = "Research"
-VERSION  = "2.0.0"
+VERSION  = "2.0.1"
 MAX_FIND = 40 # When to enter 'tally only' mode
 
 '''
@@ -24,12 +24,15 @@ Website:   https://mightymaxims.com/
 b81 = True
 
 import sys
-sys.path.append('..')
+if '..' not in sys.path:
+    sys.path.append('..')
+
 from bible9000.sierra_dao  import SierraDAO
 from bible9000.sierra_note import NoteDAO
 from bible9000.sierra_fav  import FavDAO
 from bible9000.tui import BasicTui
 from bible9000.words import WordList
+from bible9000.admin_ops import *
 
 BOOKS    = SierraDAO.GetTestaments()
 
@@ -182,7 +185,6 @@ def edit_subjects(sierra):
         pass
 
 
-
 def edit_notes(sierra):
     sierra = int(sierra)
     notes = []
@@ -313,6 +315,16 @@ def do_search_notes():
     BasicTui.DisplayTitle(f'There are {count} Notes.')
 
 
+def do_admin_ops():
+    options = [
+        ("o", "Data Export (w.i.p)", do_data_export),
+        ("i", "Data Import (w.i.p)", do_data_import),
+        ("#", "HTML Report (w.i.p)", do_report_html),
+        ("$", "Data Dump   (w.i.p)",   do_data_dump),
+        ("&", "Data Restore(w.i.p)",do_data_restore),
+        ("q", "Quit", dum)
+    ]
+    do_func("Administration: ", options, '> Admin Menu')
 
 def mainloop():
     ''' TUI features and functions. '''   
@@ -325,6 +337,7 @@ def mainloop():
         ("s", "Search", do_search_books),
         ("@", "Notes", do_search_notes),
         ("*", "Stars", do_search_stars),
+        ("a", "Admin", do_admin_ops),
         ("q", "Quit", dum)
     ]
     BasicTui.SetTitle('The Stick of Joseph')

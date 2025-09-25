@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 # Status: Testing Success.
 import sqlite3
+import sys
+if '..' not in sys.path:
+    sys.path.append('..')
 from bible9000.tui import BasicTui
 from bible9000.sierra_dao import SierraDAO
 

@@ -7,7 +7,8 @@ Revision: 1.5.2
 '''
 
 import sys
-sys.path.append('..')
+if '..' not in sys.path:
+    sys.path.append('..')
 
 from bible9000.tui import BasicTui
 import sqlite3
@@ -34,6 +35,13 @@ class NoteDAO():
             self._Notes  = row[5]
             self.NextId = row[6]
 
+    @property
+    def Sierra(self):
+        return self.vStart
+
+    @Sierra.setter
+    def Sierra(self, value):
+        self.vStart = value
 
     @property
     def Notes(self):
@@ -106,7 +114,6 @@ Notes  = "{row._Notes}", \
 NextId = {row.NextId} WHERE ID = {row.ID};'
         self.dao.conn.execute(cmd)
         self.dao.conn.connection.commit()
-        print('ok',cmd)
         return True
         
     def notes_for(self, sierra):
@@ -124,7 +131,8 @@ AND Notes <> "" ORDER BY vStart;'
 
     def get_notes(self):
         ''' Get all notes. '''
-        cmd = 'SELECT * FROM SqlNotes WHERE Notes <> "" ORDER BY vStart;'
+        cmd = 'SELECT * FROM SqlNotes \
+WHERE Notes <> "" ORDER BY vStart;'
         try:
             res = self.dao.conn.execute(cmd)
             for a in res:

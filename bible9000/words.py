@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import sys
-sys.path.append('..')
+if '..' not in sys.path:
+    sys.path.append('..')
 from bible9000.tui import BasicTui
 
 class WordList:

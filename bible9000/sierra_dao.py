@@ -6,6 +6,8 @@ Status: PRODUCTION / STABLE
 Revision: 1.5.2
 '''
 import sys
+if '..' not in sys.path:
+    sys.path.append('..')
 import sqlite3
 from bible9000.tui import BasicTui
 
