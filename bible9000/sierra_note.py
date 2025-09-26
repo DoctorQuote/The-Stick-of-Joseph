@@ -3,17 +3,17 @@
 File: sierra_note.py
 Problem Domain: Database / DAO
 Status: PRODUCTION / STABLE
-Revision: 1.5.2
+Revision: 1.7.0
 '''
 
 import sys
 if '..' not in sys.path:
     sys.path.append('..')
 
-from bible9000.tui import BasicTui
 import sqlite3
 from bible9000.tui import BasicTui
 from bible9000.sierra_dao import SierraDAO
+from bible9000.words import WordList
 
 class NoteDAO():
     ''' Manage the NoteDAOs Table '''
@@ -31,8 +31,14 @@ class NoteDAO():
             self.vStart = row[1]
             self.vEnd   = row[2]
             self.kwords = row[3]
-            self._Subject= row[4]
-            self._Notes  = row[5]
+            if not row[4]:
+                self._Subject = ''
+            else:
+                self._Subject= row[4]
+            if not row[5]:
+                self._Notes = ''
+            else:
+                self._Notes  = row[5]
             self.NextId = row[6]
 
     @property
@@ -44,20 +50,50 @@ class NoteDAO():
         self.vStart = value
 
     @property
-    def Notes(self):
-        return self.from_db(self._Notes)
+    def Notes(self)->list:
+        ''' Always returns a list. '''
+        return WordList.StringToList(self.from_db(self._Notes))
     
     @Notes.setter
     def Notes(self, value):
-        self._Notes = self.to_db(value)
+        ''' Assign EITHER a string or a list. '''
+        if isinstance(value, str):
+            value = [value]
+        for ss in range(len(value)):
+            value[ss] = self.to_db(value[ss])
+        self._Notes = WordList.ListToString(value)
 
     @property
-    def Subject(self):
-        return self.from_db(self._Subject)
+    def Subject(self)->list:
+        ''' Always returns a list. '''
+        return WordList.StringToList(self.from_db(self._Subject))
     
     @Subject.setter
     def Subject(self, value):
-        self._Subject = self.to_db(value)
+        ''' Assign EITHER a string or a list. '''
+        if isinstance(value, str):
+            value = [value]
+        for ss in range(len(value)):
+            value[ss] = self.to_db(value[ss])
+        self._Subject = WordList.ListToString(value)
+    
+    def add_note(self, note):
+        ''' Add a note to the list of '''
+        notes = self.Notes
+        notes.append(note)
+        self.Notes = notes
+
+    def add_subject(self, subject):
+        ''' Add a subject to the list of '''
+        subjects = self.Subject
+        subjects.append(subject)
+        self.Subject = subjects
+    
+    def is_null(self)->bool:
+        ''' Bound to change ... '''
+        if len(self._Notes) or len(self._Subject):
+            return False
+        return True
 
     def to_db(self, text):
         ''' Resore Quotes. '''
@@ -72,6 +108,13 @@ class NoteDAO():
             return ''
         text = str(text)
         return text.replace("''",'"')
+
+    def rollback(self):
+        ''' junk recent changes. False if none. '''
+        if(self.dao):
+            self.dao.conn.connection.rollback()
+            return True
+        return False
     
     @staticmethod
     def GetDAO(bSaints=False, database=None):
@@ -83,9 +126,12 @@ class NoteDAO():
         result.dao = SierraDAO.GetDAO(bSaints, database)
         return result
 
-    def insert_note(self, row)->bool:
+    def create_or_insert_note(self, row)->bool:
+        ''' Insert or update a note. '''
         if not isinstance(row, NoteDAO):
             return False
+        if row.ID:
+            return self.update_note(row)
         cmd = f'INSERT INTO SqlNotes \
 (vStart, vEnd, kwords, Subject, Notes, NextId) VALUES \
 ({row.vStart}, {row.vEnd}, "{row.kwords}", "{row._Subject}", \
@@ -97,12 +143,16 @@ class NoteDAO():
     def delete_note(self, row)->bool:
         if not isinstance(row, NoteDAO):
             return False
+        if row.ID == 0:
+            return True # ain't there.
         cmd = f'DELETE from SqlNotes WHERE ID = {row.ID};'
         self.dao.conn.execute(cmd)
         self.dao.conn.connection.commit()
+        row.ID = 0
         return True
         
     def update_note(self, row)->bool:
+        ''' Will also remove any null notes. '''
         if not isinstance(row, NoteDAO):
             return False
         cmd = f'UPDATE SqlNotes SET \
@@ -116,47 +166,20 @@ NextId = {row.NextId} WHERE ID = {row.ID};'
         self.dao.conn.connection.commit()
         return True
         
-    def notes_for(self, sierra):
-        ''' Get all notes on a verse. '''
-        cmd = f'SELECT * FROM SqlNotes \
-WHERE vStart = {sierra} \
-AND Notes <> "" ORDER BY vStart;'
+    def note_for(self, sierra):
+        ''' Get THE note on a verse. '''
+        cmd = f'SELECT * FROM SqlNotes WHERE vStart = {sierra} LIMIT 1;'
         try:
             res = self.dao.conn.execute(cmd)
-            for a in res:
-                yield NoteDAO(a)
+            if res:
+                return NoteDAO(res.fetchone())
         except Exception as ex:
             BasicTui.DisplayError(ex)
         return None
 
     def get_notes(self):
         ''' Get all notes. '''
-        cmd = 'SELECT * FROM SqlNotes \
-WHERE Notes <> "" ORDER BY vStart;'
-        try:
-            res = self.dao.conn.execute(cmd)
-            for a in res:
-                yield NoteDAO(a)
-        except Exception as ex:
-            BasicTui.DisplayError(ex)
-        return None
-
-    def subjects_for(self, sierra):
-        ''' Get all subject on a verse, else None! '''
-        cmd = f'SELECT * FROM SqlNotes \
-WHERE vStart = {sierra} \
-AND Subject <> "" ORDER BY vStart;'
-        try:
-            res = self.dao.conn.execute(cmd)
-            for a in res:
-                yield NoteDAO(a)
-        except Exception as ex:
-            BasicTui.DisplayError(ex)
-        return None
-
-    def get_subjects(self):
-        ''' Get all Subject rows, else None! '''
-        cmd = 'SELECT * FROM SqlNotes WHERE Subject <> "" ORDER BY vStart;'
+        cmd = 'SELECT * FROM SqlNotes ORDER BY vStart;'
         try:
             res = self.dao.conn.execute(cmd)
             for a in res:
@@ -167,14 +190,13 @@ AND Subject <> "" ORDER BY vStart;'
 
     def get_subjects_list(self)->list:
         ''' Get all Subjects into a sorted list - can be empty. '''
-        from words import WordList
         results = set()
         cmd = 'SELECT * FROM SqlNotes WHERE Subject <> "";'
         try:
             res = self.dao.conn.execute(cmd)
             for a in res:
                 row = NoteDAO(a)
-                results = results.union(WordList.Decode(row.Subject))
+                results = results.union(row.Subject)
         except Exception as ex:
             BasicTui.DisplayError(ex)
         return sorted(list(results),reverse=False)
@@ -198,16 +220,19 @@ if __name__ == '__main__':
         row.vStart  = t
         row.Notes   = f"note{t}"
         row.Subject = f"subject{t}"
-        db.insert_note(row)
+        db.create_or_insert_note(row)
     for row in list(db.get_notes()):
-        row.Notes = f'Updated "{row.Notes}"'
-        row.Subject = "Updated " + row.Subject
+        cols = row.Notes
+        cols[0] = 'Updated ' + cols[0]
+        row.Notes = cols
+        cols = row.Subject
+        cols[0] = 'Updated ' + cols[0]
+        row.Subject = cols
         db.update_note(row)
         print('~')
     for row in db.get_notes():
-        print(row.__dict__)
-        print(row.Notes)
-    print(db.get_subjects_list())
+        print('ZNOTE',row.__dict__)
+    print('SLISTS',db.get_subjects_list())
     # db.dao.conn.connection.rollback()
     db.dao.conn.connection.close()
     if os.path.exists(testdb):

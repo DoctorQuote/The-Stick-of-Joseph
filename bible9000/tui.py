@@ -100,8 +100,10 @@ class BasicTui:
         if dao.is_fav(row['sierra']):
             right.append(*lwrap.wrap('* Starred *'))
         dao = NoteDAO.GetDAO(True)
-        for note in dao.notes_for(row['sierra']):
-            for zline in lwrap.wrap(note.Notes.strip()):
+        dbrow = dao.note_for(row['sierra'])
+        if not dbrow: return False
+        for line in dbrow.Notes:
+            for zline in lwrap.wrap(line.strip()):
                 right.append(zline)
         ll=len(left);lr = len(right)
         if not lr:

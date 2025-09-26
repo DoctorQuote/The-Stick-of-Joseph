@@ -5,23 +5,29 @@ if '..' not in sys.path:
 from bible9000.tui import BasicTui
 
 class WordList:
-    ''' Edit a pipe-delimited set of words in a string. '''
+    ''' Edit a token-delimited set of words in a string. '''
     @staticmethod  
-    def Encode(alist:list)->str:
-        ''' Convert a list to a string. '''
-        return '|'.join(alist)
+    def ListToString(alist:list)->str:
+        ''' Convert a list to a string. Map special character to other. '''
+        if not alist:
+            return ''
+        for ss in range(len(alist)):
+            alist[ss] = alist[ss].replace('.|$', 'or')
+        return '.|$'.join(alist)
     
     @staticmethod  
-    def Decode(line:str)->list:
-        ''' Decode a string into a list. '''
-        return line.split('|')
+    def StringToList(line:str)->list:
+        ''' StringToList a string into a list. '''
+        if not line:
+            return []
+        return line.split('.|$')
 
     @staticmethod
     def Edit(line:str)->str:
-        ''' Edit a string of pipe-Encoded words. '''
+        ''' Edit a string of pipe-ListToStringd words. '''
         if not line or not isinstance(line, str):
             return ''
-        line = WordList.Decode(line)
+        line = WordList.StringToList(line)
         while True:
             try:
                 for ss, l in enumerate(line,1):
@@ -30,7 +36,7 @@ class WordList:
                 if not opt:
                     continue
                 if opt[0] == 'q':
-                    return WordList.Encode(line)
+                    return WordList.ListToString(line)
                 if opt[0] == '+':
                     opt = BasicTui.Input('Input > ').strip()
                     if opt:
@@ -56,7 +62,7 @@ class WordList:
 if __name__ == '__main__':
     lines = WordList.Edit(None)
     lines = WordList.Edit('')
-    zin = 'able|"baker"|charley|delta|zulu'
+    zin = 'able.|$"baker".|$charley.|$delta.|$zulu'
     lines = WordList.Edit(zin)
     print(lines)
     

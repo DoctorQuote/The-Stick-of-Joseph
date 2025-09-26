@@ -4,7 +4,7 @@ if '..' not in sys.path:
     sys.path.append('..')
 from bible9000.sierra_dao import SierraDAO
 from bible9000.tui        import BasicTui
-    
+
 tables = {
     'SqlTblVerse':'CREATE TABLE IF NOT EXISTS SqlTblVerse (ID Integer PRIMARY KEY AUTOINCREMENT, BookID int, BookChapterID int, BookVerseID int, Verse String, VerseType int);',
     'SqlNotes'   :'CREATE TABLE IF NOT EXISTS SqlNotes (ID Integer PRIMARY KEY AUTOINCREMENT, vStart int, vEnd int, kwords String, Subject String, Notes String, NextId int);',
@@ -16,17 +16,22 @@ tables = {
 def do_data_export():
     BasicTui.DisplayTitle("work in progress.")
 
+
 def do_data_import():
     BasicTui.DisplayTitle("work in progress.")
+
 
 def do_report_html():
     BasicTui.DisplayTitle("work in progress.")
 
+
 def do_data_dump():
     BasicTui.DisplayTitle("work in progress.")
 
+
 def do_data_restore():
     BasicTui.DisplayTitle("work in progress.")
+
 
 def get_database():
     ''' Get the installed database location. '''
@@ -111,7 +116,56 @@ def destroy_everything():
     ;'''
         dao.conn.execute(cmd)
     dao.conn.connection.commit()
-        
 
 
+def consolidate_notes():
+    from sierra_note import NoteDAO
+    from words import WordList
+    dao = NoteDAO.GetDAO(True)
+    notes = dict()
+    for note in dao.get_notes():
+        if not note.Sierra in notes:
+            notes[note.Sierra] = []
+        notes[note.Sierra].append(note)
+    for sierra in notes:
+        mega = NoteDAO()
+        if len(notes[sierra]) > 1:
+            # Got dups.
+            sigma = set(); maga = set()
+            for note in notes[sierra]:
+                sigma.union(WordList.Decode(note.Subjects))
+                maga.union(WordList.Decode(note.Notes))
+            mega.Sierra = sierra
+            if sigma:
+                mega.Subject = WordList.Encode(list(sigma))
+            if maga:
+                mega.Notes = WordList.Encode(list(maga))
+            # UNLOVED - Every other value is presently unused.
+            if dao.insert_note(mega):
+                # Junk the dups
+                for old in notes[sierra]:
+                    if not dao.delete(old):
+                        dao.rollback()
+                        return False
+    return True
+                
+
+def do_admin_ops():
+    from bible9000.main import do_func, dum
+    ''' What users can do. '''
+    options = [
+        ("o", "Data Export (w.i.p)", do_data_export),
+        ("i", "Data Import (w.i.p)", do_data_import),
+        ("#", "HTML Report (w.i.p)", do_report_html),
+        ("$", "Data Dump   (w.i.p)", do_data_dump),
+        ("&", "Data Restore(w.i.p)", do_data_restore),
+        ("q", "Quit", dum)
+    ]
+    do_func("Administration: ", options, '> Admin Menu')        
+
+
+if __name__ == '__main__':
+##    if consolidate_notes() == True:
+##        print("Consolidated.")
+    do_admin_ops()
 

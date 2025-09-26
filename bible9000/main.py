@@ -108,22 +108,22 @@ def do_search_books():
                     if BOOKS['bom'].count(_id): 
                         exbook['a'] += 1
                         continue
-                sigma += 1
-                if sigma == MAX_FIND:
-                    yikes = True
-                    BasicTui.DisplayError(f"Results >= {MAX_FIND} ...")
-                if not yikes:
-                    BasicTui.DisplayVerse(row)
+            sigma += 1
+            if sigma == MAX_FIND:
+                yikes = True
+                BasicTui.DisplayError(f"Results >= {MAX_FIND} ...")
+            if not yikes:
+                BasicTui.DisplayVerse(row)
         if exbook:
             BasicTui.DisplayTitle("Omissions")
             for key in exbook:
                 BasicTui.Display(f'{key} has {exbook[key]} matches.')
-        BasicTui.DisplayTitle(f"Displayed {sigma} Verses")
+        BasicTui.DisplayTitle(f"Detected {sigma} Verses")
 
 
 def do_list_books():
-    ''' Displays the books. Saint = superset. Returns number
-        of books displayed to permit selections of same.
+    ''' Displays the books. Returns number of books displayed
+        to permit selections of same.
     '''
     return BasicTui.DisplayBooks()
 
@@ -178,44 +178,49 @@ def do_classic_reader():
 
 
 def edit_subjects(sierra):
-    sierra = int(sierra)
-    notes = []
-    dao = NoteDAO.GetDAO(b81)
-    for ss, note in enumerate(dao.subjects_for(sierra),1):
-        pass
+    ''' Associate 'subjects' with a Sierra verse.
+        Subjects permit common 'topic threads' across
+        a series of notes / stars. '''
+    pass
 
 
-def edit_notes(sierra):
+def edit_notes(sierra)->bool:
+    ''' Manage the '.edit.' mode for any Sierra verse #. '''
     sierra = int(sierra)
-    notes = []
     dao = NoteDAO.GetDAO(b81)
-    for ss, note in enumerate(dao.notes_for(sierra),1):
-        line = f'{ss}.) {note.Notes}'
+    row = dao.note_for(sierra)
+    if not row: return False
+    notes = []
+    for ss, n in enumerate(row.Notes,1):
+        line = f'{ss}.) {n}'
         BasicTui.Display(line)
-        notes.append(note)
+        notes.append(n)
     try:
         inum = int(BasicTui.Input("Number to edit > ")) - 1
-        if inum >= len(notes):
-            raise Exception()
         znote = BasicTui.Input('Notes: ').strip()
         if not znote:
             ok = BasicTui.Input('Delete Note (N/y) ?').strip()
             if ok and ok.lower()[0] == 'y':
-                row = notes[inum]
-                dao.delete_note(row)
-                BasicTui.Display('Note deleted.')
-                return
+                notes.pop(inum)
             else:
-                raise Exception()
-        row = notes[inum]
-        row.Notes = znote
-        dao.update_note(row)
+                return False
+        else:
+            notes[inum] = znote # edited
+        row.Notes = notes
+        if row.is_null():
+            dao.delete_note(row)
+        else:
+            dao.update_note(row)
         BasicTui.Display('Note updated.')
-    except:
-        BasicTui.Display('done')
+    except Exception as ex:
+        BasicTui.DisplayError(ex)
+        return False
+    BasicTui.Display('done')
+    return True
 
 
 def manage_notes(sierra):
+    ''' Create, edit, and delete notes for any Sierra verse #. '''
     sierra = int(sierra)
     BasicTui.Display("Use .edit. to fix notes")
     notes = BasicTui.Input('Notes: ').strip()
@@ -226,10 +231,12 @@ def manage_notes(sierra):
         edit_notes(sierra)
         return
     dao = NoteDAO.GetDAO(b81)
-    row = NoteDAO()
+    row = dao.note_for(sierra)
+    if not row:
+        row = NoteDAO()
     row.vStart = sierra
-    row.Notes = notes
-    dao.insert_note(row)
+    row.add_note(notes)
+    dao.create_or_insert_note(row)
     BasicTui.Display(f"Note added for {sierra}.")
     
     
@@ -293,10 +300,12 @@ def browse_from(sierra)->int:
             BasicTui.DisplayError(ex)
             return sierra
 
+
 def show_verse(sierra):
     dao = SierraDAO.GetDAO(b81)
     verse = dict(*dao.search_verse(sierra))
     BasicTui.DisplayVerse(verse)    
+
 
 def do_search_stars():
     dao = FavDAO.GetDAO()
@@ -305,7 +314,8 @@ def do_search_stars():
         count += 1
         show_verse(fav[0])
     BasicTui.DisplayTitle(f'There are {count} Stars.')
-    
+
+   
 def do_search_notes():
     dao = NoteDAO.GetDAO()
     count = 0
@@ -314,17 +324,6 @@ def do_search_notes():
         show_verse(fav.vStart)
     BasicTui.DisplayTitle(f'There are {count} Notes.')
 
-
-def do_admin_ops():
-    options = [
-        ("o", "Data Export (w.i.p)", do_data_export),
-        ("i", "Data Import (w.i.p)", do_data_import),
-        ("#", "HTML Report (w.i.p)", do_report_html),
-        ("$", "Data Dump   (w.i.p)",   do_data_dump),
-        ("&", "Data Restore(w.i.p)",do_data_restore),
-        ("q", "Quit", dum)
-    ]
-    do_func("Administration: ", options, '> Admin Menu')
 
 def mainloop():
     ''' TUI features and functions. '''   
