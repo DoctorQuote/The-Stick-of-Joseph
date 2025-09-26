@@ -168,16 +168,5 @@ WHERE (B.ID=BookID) AND BOOK LIKE '%{book}%' AND BookChapterID='{chapt}' AND Boo
             return None
                 
 if __name__ == "__main__":
-    ''' Ye Olde Testing '''
-    from bible9000.tui import BasicTui
-    rows = SierraDAO.ListBooks(True)
-    if len(list(rows)) != 81:
-        BasicTui.DisplayError("Testing Failure - No Books?")
-        quit()
-
-    dao = SierraDAO.GetDAO()
-    rows = dao.search("verse LIKE '%PERFECT%'")
-    if len(list(rows)) != 124:
-        BasicTui.DisplayError("Testing Failure")
-    else:
-        BasicTui.Display("Testing Success")        
+    from tests import test_dao
+    test_dao()

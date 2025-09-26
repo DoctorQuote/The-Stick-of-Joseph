@@ -102,6 +102,9 @@ class BasicTui:
         dao = NoteDAO.GetDAO(True)
         dbrow = dao.note_for(row['sierra'])
         if not dbrow: return False
+        for line in dbrow.Subject:
+            for zline in lwrap.wrap('= ' +line.strip()):
+                right.append(zline)
         for line in dbrow.Notes:
             for zline in lwrap.wrap(line.strip()):
                 right.append(zline)

@@ -2,6 +2,7 @@
 import sys
 if '..' not in sys.path:
     sys.path.append('..')
+    
 from bible9000.tui import BasicTui
 
 class WordList:
@@ -60,9 +61,6 @@ class WordList:
     
 
 if __name__ == '__main__':
-    lines = WordList.Edit(None)
-    lines = WordList.Edit('')
-    zin = 'able.|$"baker".|$charley.|$delta.|$zulu'
-    lines = WordList.Edit(zin)
-    print(lines)
+    from tests import test_words
+    test_words()
     

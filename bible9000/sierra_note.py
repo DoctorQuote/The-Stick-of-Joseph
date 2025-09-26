@@ -177,9 +177,33 @@ NextId = {row.NextId} WHERE ID = {row.ID};'
             BasicTui.DisplayError(ex)
         return None
 
-    def get_notes(self):
+    def get_all(self):
         ''' Get all notes. '''
         cmd = 'SELECT * FROM SqlNotes ORDER BY vStart;'
+        try:
+            res = self.dao.conn.execute(cmd)
+            for a in res:
+                yield NoteDAO(a)
+        except Exception as ex:
+            BasicTui.DisplayError(ex)
+        return None
+
+    def get_notes_only(self):
+        ''' Get all notes. '''
+        cmd = 'SELECT * FROM SqlNotes \
+WHERE Notes <> "" ORDER BY vStart;'
+        try:
+            res = self.dao.conn.execute(cmd)
+            for a in res:
+                yield NoteDAO(a)
+        except Exception as ex:
+            BasicTui.DisplayError(ex)
+        return None
+
+    def get_subjects_only(self):
+        ''' Get all notes. '''
+        cmd = 'SELECT * FROM SqlNotes \
+WHERE Subject <> "" ORDER BY vStart;'
         try:
             res = self.dao.conn.execute(cmd)
             for a in res:
@@ -203,38 +227,6 @@ NextId = {row.NextId} WHERE ID = {row.ID};'
 
 
 if __name__ == '__main__':
-    import os, os.path
-    testdb = "~test.sqlt3"
-    if os.path.exists(testdb):
-        os.unlink(testdb)
-    if os.path.exists(testdb):
-        raise Exception(f'Unable to remove "{testdb}"?')
-    from bible9000.admin_ops import tables
-    db = NoteDAO.GetDAO(True, testdb)
-    db.dao.conn.execute(tables['SqlNotes'])
-    tests = [
-        1, 2, 12, 3000, 3100
-        ]
-    for t in tests:
-        row = NoteDAO()
-        row.vStart  = t
-        row.Notes   = f"note{t}"
-        row.Subject = f"subject{t}"
-        db.create_or_insert_note(row)
-    for row in list(db.get_notes()):
-        cols = row.Notes
-        cols[0] = 'Updated ' + cols[0]
-        row.Notes = cols
-        cols = row.Subject
-        cols[0] = 'Updated ' + cols[0]
-        row.Subject = cols
-        db.update_note(row)
-        print('~')
-    for row in db.get_notes():
-        print('ZNOTE',row.__dict__)
-    print('SLISTS',db.get_subjects_list())
-    # db.dao.conn.connection.rollback()
-    db.dao.conn.connection.close()
-    if os.path.exists(testdb):
-        os.unlink(testdb)
+    from tests import test_notes
+    test_notes()
 

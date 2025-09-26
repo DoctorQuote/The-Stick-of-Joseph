@@ -51,34 +51,6 @@ class FavDAO():
 
 
 if __name__ == '__main__':
-    import os, os.path
-    testdb = "~test.sqlt3"
-    if os.path.exists(testdb):
-        os.unlink(testdb)
-    if os.path.exists(testdb):
-        raise Exception(f'Unable to remove "{testdb}"?')
-    from bible9000.admin_ops import tables
-    db = FavDAO.GetDAO(True, testdb)
-    db.dao.conn.execute(tables['SqlFav'])
-    tests = [
-        1, 2, 12, 3000, 3100
-        ]
-    print('toggle on')
-    for t in tests:
-        db.toggle_fav(t)        
-    for row in db.get_favs():
-        print(row)
-        if not db.is_fav(row[0]):
-            print("- error")
-    print('toggle off')
-    for t in tests:
-        db.toggle_fav(t)
-        if db.is_fav(t):
-            print("+ error")
-    for row in db.get_favs():
-        print(row)
-    # db.dao.conn.connection.rollback()
-    db.dao.conn.connection.close()
-    if os.path.exists(testdb):
-        os.unlink(testdb)
+    from tests import test_favs
+    test_favs()
 

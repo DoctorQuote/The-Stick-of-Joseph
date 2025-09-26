@@ -58,6 +58,16 @@ def do_func(prompt, options, level):
                 o[2]()
 
 
+def do_search_subjects():
+    ''' Just a basic list of subjects, for now. '''
+    dao = NoteDAO.GetDAO(b81)
+    count = 0
+    for ss, subject in enumerate(dao.get_subjects_list()):
+        BasicTui.Display(f'{ss}.> {subject}')
+        count += 1
+    BasicTui.Display(f"{count} Subjects.")
+        
+
 def do_search_books():
     ''' Search books & read from results. '''
     while True:
@@ -177,41 +187,43 @@ def do_classic_reader():
         BasicTui.DisplayError(ex)
 
 
-def edit_subjects(sierra):
-    ''' Associate 'subjects' with a Sierra verse.
-        Subjects permit common 'topic threads' across
-        a series of notes / stars. '''
-    pass
-
-
-def edit_notes(sierra)->bool:
+def edit_notes(sierra, is_subject=False)->bool:
     ''' Manage the '.edit.' mode for any Sierra verse #. '''
+    noun = 'Note'
+    if is_subject:
+        noun = 'Subject'
     sierra = int(sierra)
     dao = NoteDAO.GetDAO(b81)
     row = dao.note_for(sierra)
     if not row: return False
     notes = []
-    for ss, n in enumerate(row.Notes,1):
+    data = row.Notes
+    if is_subject:
+        data = row.Subject
+    for ss, n in enumerate(data,1):
         line = f'{ss}.) {n}'
         BasicTui.Display(line)
         notes.append(n)
     try:
         inum = int(BasicTui.Input("Number to edit > ")) - 1
-        znote = BasicTui.Input('Notes: ').strip()
+        znote = BasicTui.Input(f'{noun}: ').strip()
         if not znote:
-            ok = BasicTui.Input('Delete Note (N/y) ?').strip()
+            ok = BasicTui.Input(f'Delete {noun} (N/y) ?').strip()
             if ok and ok.lower()[0] == 'y':
                 notes.pop(inum)
             else:
                 return False
         else:
             notes[inum] = znote # edited
-        row.Notes = notes
+        if is_subject:
+            row.Subject = notes
+        else:
+            row.Notes = notes
         if row.is_null():
             dao.delete_note(row)
         else:
             dao.update_note(row)
-        BasicTui.Display('Note updated.')
+        BasicTui.Display(f'{noun} updated.')
     except Exception as ex:
         BasicTui.DisplayError(ex)
         return False
@@ -219,26 +231,44 @@ def edit_notes(sierra)->bool:
     return True
 
 
-def manage_notes(sierra):
+def manage_notes(sierra, is_subject=False):
     ''' Create, edit, and delete notes for any Sierra verse #. '''
+    noun = 'Note'
+    if is_subject:
+        noun = 'Subject'
     sierra = int(sierra)
-    BasicTui.Display("Use .edit. to fix notes")
-    notes = BasicTui.Input('Notes: ').strip()
+    BasicTui.Display(f"Use .edit. to fix {noun}s")
+    notes = BasicTui.Input(f'{noun}s: ').strip()
     if not notes:
-        BasicTui.Display("No note.")
+        BasicTui.Display(f"No {noun}.")
         return
     if notes == '.edit.':
-        edit_notes(sierra)
-        return
+        return edit_notes(sierra, is_subject)
     dao = NoteDAO.GetDAO(b81)
     row = dao.note_for(sierra)
     if not row:
         row = NoteDAO()
     row.vStart = sierra
-    row.add_note(notes)
+    if is_subject:
+        row.add_subject(notes)
+    else:
+        row.add_note(notes)
     dao.create_or_insert_note(row)
-    BasicTui.Display(f"Note added for {sierra}.")
-    
+    BasicTui.Display(f"{noun} added for {sierra}.")
+    return True
+
+
+def edit_subjects(sierra):
+    ''' Associate 'subjects' with a Sierra verse.
+        Subjects permit common 'topic threads' across
+        a series of notes / stars. '''
+    return edit_subjects(sierra, True)
+
+
+def manage_subjects(sierra):
+    ''' Create, edit, and delete subjects for any Sierra verse #. '''
+    return manage_notes(sierra, True)
+
     
 def browse_from(sierra)->int:
     ''' Start reading at a Sierra location.
@@ -256,7 +286,7 @@ def browse_from(sierra)->int:
         if not BasicTui.DisplayVerse(verse):
             return 0
         # do_func too much for a reader, methinks.
-        option = BasicTui.Input('?, *, @, n, p, [q]uit > ').strip()
+        option = BasicTui.Input('?, *, @, =, n, p, [q]uit > ').strip()
         if not option:
             option = 'n'
         try:
@@ -265,6 +295,7 @@ def browse_from(sierra)->int:
                 BasicTui.DisplayHelp('? = help',
                 '* = toggle star',
                 '@ = manage notes',
+                '= = manage subjects',
                 'n = next page',
                 'p = last page',
                 'q = quit')
@@ -279,8 +310,12 @@ def browse_from(sierra)->int:
                     BasicTui.Display(f'De-starred {sierra}.')
                 continue
             if o == '@':
-                BasicTui.DisplayTitle('NOTE')
+                BasicTui.DisplayTitle('NOTES')
                 manage_notes(sierra)
+                continue
+            if o == '=':
+                BasicTui.DisplayTitle('SUBJECTS')
+                manage_subjects(sierra)
                 continue
             elif o == 'p':
                 if sierra == 1:
@@ -306,20 +341,20 @@ def show_verse(sierra):
     verse = dict(*dao.search_verse(sierra))
     BasicTui.DisplayVerse(verse)    
 
-
-def do_search_stars():
-    dao = FavDAO.GetDAO()
-    count = 0
-    for fav in dao.get_favs():
-        count += 1
-        show_verse(fav[0])
-    BasicTui.DisplayTitle(f'There are {count} Stars.')
+## Unloved.
+##def do_search_stars():
+##    dao = FavDAO.GetDAO()
+##    count = 0
+##    for fav in dao.get_favs():
+##        count += 1
+##        show_verse(fav[0])
+##    BasicTui.DisplayTitle(f'There are {count} Stars.')
 
    
-def do_search_notes():
+def do_user_report():
     dao = NoteDAO.GetDAO()
     count = 0
-    for fav in dao.get_notes():
+    for fav in dao.get_all():
         count += 1
         show_verse(fav.vStart)
     BasicTui.DisplayTitle(f'There are {count} Notes.')
@@ -334,8 +369,8 @@ def mainloop():
         ("c", "Classic Reader", do_classic_reader),
         ("r", "Random Reader", do_random_reader),
         ("s", "Search", do_search_books),
-        ("@", "Notes", do_search_notes),
-        ("*", "Stars", do_search_stars),
+        ("=", "Subjects", do_search_subjects),
+        ("#", "Report", do_user_report),
         ("a", "Admin", do_admin_ops),
         ("q", "Quit", dum)
     ]
