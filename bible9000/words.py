@@ -33,13 +33,13 @@ class WordList:
             try:
                 for ss, l in enumerate(line,1):
                     BasicTui.Display(f'{ss}.) {l}')
-                opt = BasicTui.Input('?, -, +, q > ').strip()
+                opt = BasicTui.Input('?, -, +, q > ')
                 if not opt:
                     continue
                 if opt[0] == 'q':
                     return WordList.ListToString(line)
                 if opt[0] == '+':
-                    opt = BasicTui.Input('Input > ').strip()
+                    opt = BasicTui.Input('Input > ')
                     if opt:
                         line.append(opt)
                     continue

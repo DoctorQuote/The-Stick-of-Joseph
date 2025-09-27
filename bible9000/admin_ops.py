@@ -19,9 +19,11 @@ def do_report_html():
     BasicTui.DisplayTitle("work in progress.")
 
 
-def do_export_user_data():
-    ''' Export user's NOTES and FAV's '''
+def do_export_user_data(prefix=None)->str:
+    ''' Export user's NOTES and FAV's. File name returned. '''
     fname = time.strftime("%Y%m%d-%H%M%S") + '.sbbk'
+    if prefix:
+        fname = prefix + fname
     count = 0
     with open(fname, 'w') as fh:
         dao = NoteDAO.GetDAO(True)
@@ -33,6 +35,7 @@ def do_export_user_data():
             print(repr(row), file=fh)
             count += 1
     BasicTui.Display(f"Exported {count} items into {fname}.")
+    return fname
 
 
 def do_import_user_data()->bool:
@@ -75,7 +78,7 @@ def do_rename_user_export()->bool:
     inum = BasicTui.InputNumber('Rename #> ') -1
     if inum < 0 or inum >= len(files):
         return False
-    zname = BasicTui.Input('New file name > ').strip()
+    zname = BasicTui.Input('New file name > ')
     if not zname:
         BasicTui.Display('Not renamed.')
         return False
@@ -83,7 +86,7 @@ def do_rename_user_export()->bool:
         zname += '.sbbk'
     if os.path.exists(zname):
         BasicTui.Display(f'Whoops - {zname} already exists.')
-        op = BasicTui.Input(f'Ok to overwrite {zname}? y/N > ').strip()
+        op = BasicTui.Input(f'Ok to overwrite {zname}? y/N > ')
         if not op or op[0] != 'y':
             BasicTui.Display(f'File {zname} not changed.')
             return False
@@ -91,10 +94,12 @@ def do_rename_user_export()->bool:
     BasicTui.DisplayTitle(f"Exported {zname} - share and enjoy.")
     return True
 
+
 def get_database():
     ''' Get the installed database location. '''
     pdir = os.path.abspath(os.path.dirname(__file__))
     return os.path.join(pdir, 'biblia.sqlt3')
+
 
 def destory_notes_and_fav():
     ''' Handy when cleaning-up after r&d (etc.) '''
@@ -207,6 +212,27 @@ def consolidate_notes():
                         return False
     return True
 
+
+def do_user_db_reset()->bool:
+    ''' Remove all user data. a bakcup_* file is created.'''
+    opt = BasicTui.Input('Remove custom content? y/N > ')
+    if not opt or opt[0] != 'y':
+        BasicTui.Display('Nothing removed.')
+        return False
+    fname = do_export_user_data('backup_')
+    if not fname:
+        BasicTui.DisplayError(f'Unable to backup to {fname}.')
+        BasicTui.Display('Nothing removed.')
+        return False
+    dao = SierraDAO.GetDAO()
+    for key in ('SqlNotes', 'SqlFav'):
+        dao.conn.execute(f'DROP TABLE IF EXISTS {key};')
+        dao.conn.execute(tables[key])
+    create_tables()
+    BasicTui.Display(f'Database has been reset. Backup archive saved as {fname}.')
+    return True
+
+
 def do_user_admin_help():
     BasicTui.Display('#: [HTML Report]')
     BasicTui.Display('The HTML Report is a great way to share your \
@@ -227,11 +253,16 @@ PLEASE NOTE THAT notes on any EXISTING verse will be replaced!')
     BasicTui.Display('The best way to select, rename, and better \
 share any previously exported data archive with others.')
     BasicTui.Display('~~~~~')
+    BasicTui.Display('!: [Database Reset]')
+    BasicTui.Display('Resets the database. Removes all notes, \
+favorites, and subjects.')
+    BasicTui.Display('~~~~~')
     BasicTui.Display('?: [Help]')
     BasicTui.Display('Show this menu :-)')
     BasicTui.Display('~~~~~')
     BasicTui.Display('q: [Return] to previous session.')
     BasicTui.Display('~~~~~')
+
 
 def do_admin_ops():
     from bible9000.main import do_func, dum
@@ -241,6 +272,7 @@ def do_admin_ops():
         ("o", "Data Export", do_export_user_data),
         ("i", "Data Import", do_import_user_data),
         ("r", "Rename Data Export", do_rename_user_export),
+        ("!", "Reset Database", do_user_db_reset),
         ("?", "Help", do_user_admin_help),
         ("q", "Quit", dum)
     ]

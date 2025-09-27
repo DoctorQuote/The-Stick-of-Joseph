@@ -27,7 +27,7 @@ class BasicTui:
     @staticmethod
     def Input(prompt:str)->str:
         ''' Great for regressive testing. '''
-        return input(prompt)
+        return input(prompt).strip()
     
     @staticmethod
     def InputNumber(prompt:str, default=-1)->str:

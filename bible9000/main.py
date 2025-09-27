@@ -5,7 +5,7 @@ Problem Domain: Console Application
 '''
 
 STATUS   = "Research"
-VERSION  = "2.1.0"
+VERSION  = "2.1.1"
 MAX_FIND = 40 # When to enter 'tally only' mode
 
 '''
@@ -215,9 +215,9 @@ def edit_notes(sierra, is_subject=False)->bool:
     inum = BasicTui.InputNumber("Number to edit > ") - 1
     if inum < 0:
         return False
-    znote = BasicTui.Input(f'{noun}: ').strip()
+    znote = BasicTui.Input(f'{noun}: ')
     if not znote:
-        ok = BasicTui.Input(f'Delete {noun} (N/y) ?').strip()
+        ok = BasicTui.Input(f'Delete {noun} (N/y) ?')
         if ok and ok.lower()[0] == 'y':
             notes.pop(inum)
         else:
@@ -245,7 +245,7 @@ def manage_notes(sierra, is_subject=False):
         noun = 'Subject'
     sierra = int(sierra)
     BasicTui.Display(f"Use .edit. to fix {noun}s")
-    notes = BasicTui.Input(f'{noun}s: ').strip()
+    notes = BasicTui.Input(f'{noun}s: ')
     if not notes:
         BasicTui.Display(f"No {noun}.")
         return
@@ -293,7 +293,7 @@ def browse_from(sierra)->int:
         if not BasicTui.DisplayVerse(verse):
             return 0
         # do_func too much for a reader, methinks.
-        option = BasicTui.Input('?, *, @, =, n, p, [q]uit > ').strip()
+        option = BasicTui.Input('?, *, @, =, n, p, [q]uit > ')
         if not option:
             option = 'n'
         try:
