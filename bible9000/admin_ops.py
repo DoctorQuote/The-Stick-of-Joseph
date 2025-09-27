@@ -1,9 +1,11 @@
-import os, os.path
-import sys
+import os, os.path, sys, time
 if '..' not in sys.path:
     sys.path.append('..')
 from bible9000.sierra_dao import SierraDAO
 from bible9000.tui        import BasicTui
+
+from sierra_note import NoteDAO
+from sierra_fav  import FavDAO
 
 tables = {
     'SqlTblVerse':'CREATE TABLE IF NOT EXISTS SqlTblVerse (ID Integer PRIMARY KEY AUTOINCREMENT, BookID int, BookChapterID int, BookVerseID int, Verse String, VerseType int);',
@@ -11,26 +13,55 @@ tables = {
     'SqlBooks'   :'CREATE TABLE IF NOT EXISTS SqlBooks (ID Integer PRIMARY KEY AUTOINCREMENT, Book String, BookMeta String);',
     'SqlFav'     :'CREATE TABLE IF NOT EXISTS SqlFav   (item Integer);',
     }
-    
-
-def do_data_export():
-    BasicTui.DisplayTitle("work in progress.")
-
-
-def do_data_import():
-    BasicTui.DisplayTitle("work in progress.")
 
 
 def do_report_html():
     BasicTui.DisplayTitle("work in progress.")
 
 
-def do_data_dump():
-    BasicTui.DisplayTitle("work in progress.")
+def do_export_user_data():
+    ''' Export user's NOTES and FAV's '''
+    fname = time.strftime("%Y%m%d-%H%M%S") + '.sbbk'
+    count = 0
+    with open(fname, 'w') as fh:
+        dao = NoteDAO.GetDAO(True)
+        for row in dao.get_all():
+            print(repr(row), file=fh)
+            count += 1
+        dao = FavDAO.GetDAO(True)
+        for row in dao.get_favs():
+            print(repr(row), file=fh)
+            count += 1
+    BasicTui.Display(f"Exported {count} items into {fname}.")
 
 
-def do_data_restore():
-    BasicTui.DisplayTitle("work in progress.")
+def do_import_user_data()->bool:
+    ''' Import user's NOTES and FAV's '''
+    files = []
+    for filename in os.listdir('.'):
+        if filename.endswith(".sbbk"):
+            files.append(filename)
+    for ss, file in enumerate(files,1):
+        print(f'{ss}.) {file}')
+    inum = BasicTui.InputNumber('Restore #> ') -1
+    if inum < 0 or inum >= len(files):
+        return False
+    with open(files[inum]) as fh:
+        ndao = NoteDAO.GetDAO(True)
+        fdao = FavDAO.GetDAO(True)
+        for ss, _str in enumerate(fh, 1):
+            obj = NoteDAO.Repr(_str)
+            if obj:
+                if not ndao.merge(obj):
+                    BasicTui.DisplayError(f'Unable to import #{ss}')
+                continue # restore
+            obj = FavDAO.Repr(_str)
+            if obj:
+                if not fdao.merge(obj):
+                    BasicTui.DisplayError(f'Unable to import #{ss}')
+                continue # restore
+            BasicTui.DisplayError(f'Unable to restore #{ss}')            
+    BasicTui.DisplayTitle(f"Restored {ss} items.")
 
 
 def get_database():
@@ -154,11 +185,9 @@ def do_admin_ops():
     from bible9000.main import do_func, dum
     ''' What users can do. '''
     options = [
-        ("o", "Data Export (w.i.p)", do_data_export),
-        ("i", "Data Import (w.i.p)", do_data_import),
         ("#", "HTML Report (w.i.p)", do_report_html),
-        ("$", "Data Dump   (w.i.p)", do_data_dump),
-        ("&", "Data Restore(w.i.p)", do_data_restore),
+        ("o", "Data Export", do_export_user_data),
+        ("i", "Data Import", do_import_user_data),
         ("q", "Quit", dum)
     ]
     do_func("Administration: ", options, '> Admin Menu')        

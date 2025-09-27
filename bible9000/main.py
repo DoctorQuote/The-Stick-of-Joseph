@@ -66,6 +66,9 @@ def do_search_subjects():
         BasicTui.Display(f'{ss}.> {subject}')
         count += 1
     BasicTui.Display(f"{count} Subjects.")
+    if count:
+        BasicTui.InputNumber("Number: ")
+        
         
 
 def do_search_books():
@@ -159,32 +162,36 @@ def do_sierra_reader()->int:
     for row in SierraDAO.ListBooks(b81):
         books.append(row['book'].lower())
     last_book = do_list_books()
-    option = BasicTui.Input('Book # > ')
-    try:
-        inum = int(option)
-        if inum < 1 or inum > last_book:
-            return
+    inum = BasicTui.InputNumber('Book # > ')
+    if inum > 0 and inum <= last_book:
         ubook = books[inum-1]
         BasicTui.Display(f'Got {ubook}.')
         vrange = SierraDAO.GetBookRange(inum)
-        option = BasicTui.Input(f'Enter a number between {vrange}, inclusive. > ')
-        return browse_from(int(option))               
-    except:
+        vnum = BasicTui.InputNumber(f'Book numbers {vrange} > ')
+        return browse_from(vnum)               
+    else:
         return 0
 
 
 def do_classic_reader():
     ''' Start browsing by classic chapter:verse. '''
     BasicTui.DisplayBooks()
-    try:
-        ibook = int(BasicTui.Input("Book #> "))
-        ichapt = int(BasicTui.Input("Chapter #> "))
-        iverse = int(BasicTui.Input("Verse #> "))
-        dao = SierraDAO.GetDAO(b81)
-        for res in dao.search(f'BookID = {ibook} AND BookChapterID = {ichapt} AND BookVerseID = {iverse}'):
-            browse_from(dict(res)['sierra'])
-    except Exception as ex:
-        BasicTui.DisplayError(ex)
+    ibook = BasicTui.InputNumber("Book #> ")
+    if ibook == -1:
+        BasicTui.DisplayError("Bad book number.")
+        return
+    ichapt = BasicTui.InputNumber("Chapter #> ")
+    if ichapt == -1:
+        BasicTui.DisplayError("Bad chapter number.")
+        return
+    iverse = BasicTui.InputNumber("Verse #> ")
+    if iverse == -1:
+        BasicTui.DisplayError("Bad verse number.")
+        return
+    dao = SierraDAO.GetDAO(b81)
+    for res in dao.search(f'BookID = {ibook} AND BookChapterID = {ichapt} AND BookVerseID = {iverse}'):
+        browse_from(dict(res)['sierra'])
+
 
 
 def edit_notes(sierra, is_subject=False)->bool:
@@ -204,29 +211,29 @@ def edit_notes(sierra, is_subject=False)->bool:
         line = f'{ss}.) {n}'
         BasicTui.Display(line)
         notes.append(n)
-    try:
-        inum = int(BasicTui.Input("Number to edit > ")) - 1
-        znote = BasicTui.Input(f'{noun}: ').strip()
-        if not znote:
-            ok = BasicTui.Input(f'Delete {noun} (N/y) ?').strip()
-            if ok and ok.lower()[0] == 'y':
-                notes.pop(inum)
-            else:
-                return False
-        else:
-            notes[inum] = znote # edited
-        if is_subject:
-            row.Subject = notes
-        else:
-            row.Notes = notes
-        if row.is_null():
-            dao.delete_note(row)
-        else:
-            dao.update_note(row)
-        BasicTui.Display(f'{noun} updated.')
-    except Exception as ex:
-        BasicTui.DisplayError(ex)
+
+    inum = BasicTui.InputNumber("Number to edit > ") - 1
+    if inum < 0:
         return False
+    znote = BasicTui.Input(f'{noun}: ').strip()
+    if not znote:
+        ok = BasicTui.Input(f'Delete {noun} (N/y) ?').strip()
+        if ok and ok.lower()[0] == 'y':
+            notes.pop(inum)
+        else:
+            return False
+    else:
+        notes[inum] = znote # edited
+    if is_subject:
+        row.Subject = notes
+    else:
+        row.Notes = notes
+    if row.is_null():
+        dao.delete_note(row)
+    else:
+        dao.update_note(row)
+        
+    BasicTui.Display(f'{noun} updated.')
     BasicTui.Display('done')
     return True
 
@@ -253,7 +260,7 @@ def manage_notes(sierra, is_subject=False):
         row.add_subject(notes)
     else:
         row.add_note(notes)
-    dao.create_or_insert_note(row)
+    dao.insert_or_update_note(row)
     BasicTui.Display(f"{noun} added for {sierra}.")
     return True
 

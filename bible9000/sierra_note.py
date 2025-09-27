@@ -18,28 +18,59 @@ from bible9000.words import WordList
 class NoteDAO():
     ''' Manage the NoteDAOs Table '''
     def __init__(self, row=None):
-        if not row:
-            self.ID     = 0
-            self.vStart = 0
-            self.vEnd   = 0
-            self.kwords = ''
-            self._Subject= ''
-            self._Notes  = ''
-            self.NextId = 0
-        else:
-            self.ID     = row[0]
-            self.vStart = row[1]
-            self.vEnd   = row[2]
-            self.kwords = row[3]
-            if not row[4]:
-                self._Subject = ''
-            else:
+        ''' Instance an empty, else populate from a list or tuple. '''
+        self.ID     = 0
+        self.vStart = 0
+        self.vEnd   = 0
+        self.kwords = ''
+        self._Subject= ''
+        self._Notes  = ''
+        self.NextId = 0
+        if row:
+            if row[0]:
+                self.ID      = row[0]
+            if row[1]:
+                self.vStart  = row[1]
+            if row[2]:
+                self.vEnd    = row[2]
+            if row[3]:
+                self.kwords  = row[3]
+            if row[4]:
                 self._Subject= row[4]
-            if not row[5]:
-                self._Notes = ''
-            else:
+            if row[5]:
                 self._Notes  = row[5]
-            self.NextId = row[6]
+            if row[6]:
+                self.NextId  = row[6]
+
+    def __repr__(self)->str:
+        ''' Representational type includes an oid. '''
+        v = vars(self)
+        v['oid'] = 'NoteDAOv1'
+        return str(v)
+
+    def merge(self, obj)->bool:
+        ''' Restore a favorite selection. '''
+        if obj and isinstance(obj, NoteDAO):
+            sierra = obj.Sierra
+            _id = self.note_for(sierra)
+            if _id:
+                obj.ID = _id.ID
+            else:
+                ibj.ID = 0
+            return self.insert_or_update_note(obj)
+        return False
+
+    @staticmethod
+    def Repr(rstr):
+        ''' Return an instance from a string or a dict
+            tagged by repr(), else None. '''
+        obj = rstr
+        if isinstance(rstr, str):
+            obj = eval(rstr)
+        if isinstance(obj, dict):
+            if 'oid' in obj and obj['oid'] == 'NoteDAOv1':
+                return NoteDAO(tuple(obj.values()))
+        return None
 
     @property
     def Sierra(self):
@@ -115,18 +146,8 @@ class NoteDAO():
             self.dao.conn.connection.rollback()
             return True
         return False
-    
-    @staticmethod
-    def GetDAO(bSaints=False, database=None):
-        ''' Connect to the database & return the DAO '''
-        if not database:
-            from bible9000.admin_ops import get_database
-            database = get_database()
-        result = NoteDAO()
-        result.dao = SierraDAO.GetDAO(bSaints, database)
-        return result
 
-    def create_or_insert_note(self, row)->bool:
+    def insert_or_update_note(self, row)->bool:
         ''' Insert or update a note. '''
         if not isinstance(row, NoteDAO):
             return False
@@ -224,6 +245,16 @@ WHERE Subject <> "" ORDER BY vStart;'
         except Exception as ex:
             BasicTui.DisplayError(ex)
         return sorted(list(results),reverse=False)
+    
+    @staticmethod
+    def GetDAO(bSaints=False, database=None):
+        ''' Connect to the database & return the DAO '''
+        if not database:
+            from bible9000.admin_ops import get_database
+            database = get_database()
+        result = NoteDAO()
+        result.dao = SierraDAO.GetDAO(bSaints, database)
+        return result
 
 
 if __name__ == '__main__':

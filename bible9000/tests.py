@@ -43,18 +43,17 @@ def test_favs():
     tests = [
         1, 2, 12, 3000, 3100
         ]
-    print('toggle on')
+
     for t in tests:
         db.toggle_fav(t)        
     for row in db.get_favs():
-        print(row)
-        if not db.is_fav(row[0]):
-            print("- error")
-    print('toggle off')
+        if not db.is_fav(row):
+            raise Exception("is_fav: - error")
+
     for t in tests:
         db.toggle_fav(t)
         if db.is_fav(t):
-            print("+ error")
+            raise Exception("is_fav: + error")
     for row in db.get_favs():
         print(row)
     # db.dao.conn.connection.rollback()
@@ -88,7 +87,7 @@ def test_notes():
         row.vStart  = t
         row.Notes   = f"note{t}"
         row.Subject = f"subject{t}"
-        db.create_or_insert_note(row)
+        db.insert_or_update_note(row)
     for row in list(db.get_all()):
         cols = row.Notes
         cols[0] = 'Updated ' + cols[0]
