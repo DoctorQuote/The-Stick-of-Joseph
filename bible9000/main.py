@@ -5,7 +5,7 @@ Problem Domain: Console Application
 '''
 
 STATUS   = "Research"
-VERSION  = "2.0.1"
+VERSION  = "2.1.0"
 MAX_FIND = 40 # When to enter 'tally only' mode
 
 '''

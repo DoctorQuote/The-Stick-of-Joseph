@@ -64,6 +64,33 @@ def do_import_user_data()->bool:
     BasicTui.DisplayTitle(f"Restored {ss} items.")
 
 
+def do_rename_user_export()->bool:
+    ''' Rename an exported user's NOTES and FAV's archive '''
+    files = []
+    for filename in os.listdir('.'):
+        if filename.endswith(".sbbk"):
+            files.append(filename)
+    for ss, file in enumerate(files,1):
+        print(f'{ss}.) {file}')
+    inum = BasicTui.InputNumber('Rename #> ') -1
+    if inum < 0 or inum >= len(files):
+        return False
+    zname = BasicTui.Input('New file name > ').strip()
+    if not zname:
+        BasicTui.Display('Not renamed.')
+        return False
+    if not zname.endswith('.sbbk'):
+        zname += '.sbbk'
+    if os.path.exists(zname):
+        BasicTui.Display(f'Whoops - {zname} already exists.')
+        op = BasicTui.Input(f'Ok to overwrite {zname}? y/N > ').strip()
+        if not op or op[0] != 'y':
+            BasicTui.Display(f'File {zname} not changed.')
+            return False
+    os.rename(files[inum], zname)
+    BasicTui.DisplayTitle(f"Exported {zname} - share and enjoy.")
+    return True
+
 def get_database():
     ''' Get the installed database location. '''
     pdir = os.path.abspath(os.path.dirname(__file__))
@@ -179,7 +206,32 @@ def consolidate_notes():
                         dao.rollback()
                         return False
     return True
-                
+
+def do_user_admin_help():
+    BasicTui.Display('#: [HTML Report]')
+    BasicTui.Display('The HTML Report is a great way to share your \
+notes, stars, and subjects with the rest of your world. Once exported \
+links to your subjects will allow quick access to topics you feel \
+can be presented together in a lesson.')
+    BasicTui.Display('~~~~~')
+    BasicTui.Display('o: [Data Export]')
+    BasicTui.Display('Export your notes, stars, and subjects to \
+an dated archive file name. A great way to save our work for later \
+restorations. ')
+    BasicTui.Display('~~~~~')
+    BasicTui.Display('i: [Data Import]')
+    BasicTui.Display('Merge any previously archived file into our work. \
+PLEASE NOTE THAT notes on any EXISTING verse will be replaced!')
+    BasicTui.Display('~~~~~')
+    BasicTui.Display('r: [Rename Data Export]')
+    BasicTui.Display('The best way to select, rename, and better \
+share any previously exported data archive with others.')
+    BasicTui.Display('~~~~~')
+    BasicTui.Display('?: [Help]')
+    BasicTui.Display('Show this menu :-)')
+    BasicTui.Display('~~~~~')
+    BasicTui.Display('q: [Return] to previous session.')
+    BasicTui.Display('~~~~~')
 
 def do_admin_ops():
     from bible9000.main import do_func, dum
@@ -188,9 +240,11 @@ def do_admin_ops():
         ("#", "HTML Report (w.i.p)", do_report_html),
         ("o", "Data Export", do_export_user_data),
         ("i", "Data Import", do_import_user_data),
+        ("r", "Rename Data Export", do_rename_user_export),
+        ("?", "Help", do_user_admin_help),
         ("q", "Quit", dum)
     ]
-    do_func("Administration: ", options, '> Admin Menu')        
+    do_func("Administration: ", options, '>> Admin Menu')        
 
 
 if __name__ == '__main__':
