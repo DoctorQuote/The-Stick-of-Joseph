@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# License: MIT
 '''
 File: tests.py
 Problem Domain: Regression testing

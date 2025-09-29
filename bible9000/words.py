@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# License: MIT
 import sys
 if '..' not in sys.path:
     sys.path.append('..')

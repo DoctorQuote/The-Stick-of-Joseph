@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# License: MIT
 '''
 File: sierra_dao.py
 Problem Domain: Database / DAO

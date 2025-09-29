@@ -1,3 +1,4 @@
+# License: MIT
 # The Stick of Joseph
 # This is the big, beautiful, free book.
 # > Includes article tags!
@@ -58,7 +59,7 @@ The link will work in every 'online' galaxy... and
 <p>
 <a href="https://MightyMaxims.com">Website</a><br>
 <a href="https://ko-fi.com/doctorquote">Community</a><br>
-<a href="https://github.com/soft9000/DoctorQuote">Project</a>
+<a href="https://github.com/DoctorQuote/The-Stick-of-Joseph">Project</a>
 </p>
 </td></tr></table>
 """
@@ -69,39 +70,63 @@ FIELDS = ['uid','vStart','vEnd','kWords',
 
 # Define the paths for your input and output database files
 
-def write_user_notes(output_html_file, quotes):
-    books = list(SierraDAO.ListBooks(True))
-    with open(output_html_file, 'w', encoding="utf8") as fh:
-        print(HEADER, file=fh)
-        ss = 1
-        for tup in quotes:
-            line = dict(zip(FIELDS, tup))
-            book = books[int(line['BookID'])-1]['book']
-            classic_ref = f" {book} {line['ChaptID']}:{line['VerseID']}"
-            ss += 1            
-            aref = f'<a href="{output_html_file}#\
+def __write_html(output_html_file, line, books, fh):
+    book = books[int(line['BookID'])-1]['book']
+    classic_ref = f" {book} {line['ChaptID']}:{line['VerseID']}"          
+    aref = f'<a href="{output_html_file}#\
 {line["uid"]}">&#127760;</a>'           
-            rec = f"<article id='{line['uid']}'>"
-            rec += "<br><table width=450 border='1' cellpadding='10'>"
-            rec += "<tr>"
-            rec += "<td bgcolor='blue'>"
-            rec += aref
-            rec += f"&nbsp;<font color='yellow'>\
+    rec = f"<article id='{line['uid']}'>"
+    rec += "<br><table width=450 border='1' cellpadding='10'>"
+    rec += "<tr>"
+    rec += "<td bgcolor='blue'>"
+    rec += aref
+    rec += f"&nbsp;<font color='yellow'>\
 Verse #{line['Sierra']}.</font>\
 <font color='gold'>{classic_ref}</font>\
 <br><font color='white'>{line['Notes']}</font>"
-            rec += "</td>"
-            rec += "</tr>"
-            rec += "<tr>"
-            rec += "<td bgcolor='gray' height='55px'>"
-            rec += "<font size='3' color='yellow'>"
-            rec += line['Verse']
-            rec += "</font>"
-            rec += "</td>"
-            rec += "</tr>"
-            rec += "</table>"
-            rec += "</article>"
-            print(rec, file=fh)
+    rec += "</td>"
+    rec += "</tr>"
+    rec += "<tr>"
+    rec += "<td bgcolor='gray' height='55px'>"
+    rec += "<font size='3' color='yellow'>"
+    rec += line['Verse']
+    rec += "</font>"
+    rec += "</td>"
+    rec += "</tr>"
+    rec += "</table>"
+    rec += "</article>"
+    print(rec, file=fh)
+
+def write_user_notes(output_html_file, quotes):
+    books = list(SierraDAO.ListBooks(True))
+    subjects = NoteDAO.GetSubjects()
+    dreport = dict()
+    for s in subjects:
+        dreport[s] = list()
+    dreport[None] = list()
+    for quote in quotes:
+        qdict = dict(zip(FIELDS, quote))
+        for subject in subjects:
+            if not qdict['Subject']:
+                # TODO: vNext ordering some day ...
+                dreport[None].append(qdict)
+                continue
+            if subject in qdict['Subject']:
+                # TODO: vNext ordering some day ...
+                dreport[subject].append(qdict)                
+    with open(output_html_file, 'w', encoding="utf8") as fh:
+        print(HEADER, file=fh)
+        if dreport:
+            for zkey in dreport:
+                if not zkey:
+                    print('<br><center><hr>General Subjects<br></center>',file=fh)
+                else:
+                    print(f'<br><center><hr>{zkey}<br></center>',file=fh)
+                for tup in dreport[zkey]:
+                    __write_html(output_html_file, tup, books, fh)
+        else:
+            for tup in quotes:
+                __write_html(output_html_file, tup, books, fh)
         print("<br><br><hr><hr><br></body>", file=fh)
         print("</html>", file=fh)
 

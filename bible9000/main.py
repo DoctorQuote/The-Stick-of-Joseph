@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
+# License: MIT
 '''
+License: MIT
 File: main.py
 Problem Domain: Console Application
 '''
 
-STATUS   = "Research"
-VERSION  = "2.1.1"
+STATUS   = "Release"
+VERSION  = "2.0.0"
 MAX_FIND = 40 # When to enter 'tally only' mode
 
 '''

@@ -1,3 +1,4 @@
+# License: MIT
 import os, os.path, sys, time
 if '..' not in sys.path:
     sys.path.append('..')

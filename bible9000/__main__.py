@@ -1,3 +1,4 @@
+# License: MIT
 try:
     from bible9000.main import mainloop
     mainloop()

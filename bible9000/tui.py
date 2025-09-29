@@ -1,3 +1,4 @@
+# License: MIT
 from bible9000.pannel import Panel
 lwrap = Panel()
 

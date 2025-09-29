@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# License: MIT
 # Status: Testing Success.
 import sqlite3
 import sys

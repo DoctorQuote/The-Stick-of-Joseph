@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# License: MIT
 '''
 File: sierra_note.py
 Problem Domain: Database / DAO
@@ -255,6 +256,12 @@ WHERE Subject <> "" ORDER BY vStart;'
         result = NoteDAO()
         result.dao = SierraDAO.GetDAO(bSaints, database)
         return result
+
+    @staticmethod
+    def GetSubjects():
+        ''' Get all Subjects into a sorted list - can be empty. '''
+        rdao = NoteDAO.GetDAO(True)
+        return rdao.get_subjects_list()
 
 
 if __name__ == '__main__':
