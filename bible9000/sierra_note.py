@@ -4,7 +4,7 @@
 File: sierra_note.py
 Problem Domain: Database / DAO
 Status: PRODUCTION / STABLE
-Revision: 1.7.0
+Revision: 1.7.5
 '''
 
 import sys
@@ -104,7 +104,7 @@ class NoteDAO():
     def Subject(self, value):
         ''' Assign EITHER a string or a list. '''
         if isinstance(value, str):
-            value = [value]
+            value = [value.strip()]
         for ss in range(len(value)):
             value[ss] = self.to_db(value[ss])
         self._Subject = WordList.ListToString(value)
@@ -246,6 +246,67 @@ WHERE Subject <> "" ORDER BY vStart;'
         except Exception as ex:
             BasicTui.DisplayError(ex)
         return sorted(list(results),reverse=False)
+
+    def subject_update(self, row)->bool:
+        ''' Beware the recursion. '''
+        cursor = NoteDAO.GetDAO()
+        cmd = f'UPDATE SqlNotes SET Subject = "{row._Subject}" \
+where ID = {row.ID};'
+        cursor.dao.conn.execute(cmd)
+        cursor.dao.conn.connection.commit()
+        return True
+
+    def subject_rename(self, name_from, name_to)->bool:
+        ''' Rename a subject. '''
+        if not name_from or not name_to:
+            return False
+        cmd = f'SELECT * FROM SqlNotes WHERE Subject GLOB "*{name_from}*";'
+        try:
+            cursor = NoteDAO.GetDAO()
+            res = self.dao.conn.execute(cmd)
+            for a in res:
+                row = NoteDAO(a)
+                zsub = row.Subject
+                zsub.remove(name_from)
+                zsub.append(name_to)
+                row.Subject = zsub
+                cmd = f'UPDATE SqlNotes SET Subject = "{row._Subject}" \
+where ID = {row.ID};'
+                cursor.dao.conn.execute(cmd)
+            cursor.dao.conn.connection.commit()
+        except Exception as ex:
+            BasicTui.DisplayError(ex)
+            return False
+        return True
+
+    def subject_delete(self, subject)->bool:
+        ''' Remove a subject. '''
+        if not subject:
+            return False
+        cmd = f'SELECT * FROM SqlNotes WHERE Subject GLOB "*{subject}*";'
+        try:
+            to_del = list()
+            cursor = NoteDAO.GetDAO()
+            res = self.dao.conn.execute(cmd)
+            for a in res:
+                row = NoteDAO(a)
+                zsub = row.Subject
+                zsub.remove(subject)
+                row.Subject = zsub
+                if row.is_null():
+                    to_del.append(row.ID)
+                    continue
+                cmd = f'UPDATE SqlNotes SET Subject = "{row._Subject}" \
+where ID = {row.ID};'
+                cursor.dao.conn.execute(cmd)
+            for drow in to_del:
+                cursor.dao.conn.execute(
+                    'DELETE From SqlNotes where ID = "{drow}";')    
+            cursor.dao.conn.connection.commit()
+        except Exception as ex:
+            BasicTui.DisplayError(ex)
+            return False
+        return True
     
     @staticmethod
     def GetDAO(bSaints=False, database=None):

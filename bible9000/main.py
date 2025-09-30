@@ -6,7 +6,7 @@ File: main.py
 Problem Domain: Console Application
 '''
 
-STATUS   = "Release"
+STATUS   = "Production"
 VERSION  = "2.0.0"
 MAX_FIND = 40 # When to enter 'tally only' mode
 
@@ -42,11 +42,12 @@ def dum():
     BasicTui.Display('(done)')
 
 
-def do_func(prompt, options, level):
+def do_func(prompt, options, level=None):
     '''Menued operations. '''
     choice = None
     while choice != options[-1][0]:
-        BasicTui.DisplayTitle(level)
+        if level:
+            BasicTui.DisplayTitle(level)
         for o in options:
             BasicTui.Display(o[0], o[1])
         choice = BasicTui.Input(prompt)
@@ -61,17 +62,46 @@ def do_func(prompt, options, level):
 
 
 def do_search_subjects():
-    ''' Just a basic list of subjects, for now. '''
+    ''' Mass-manage all subjects. '''
     dao = NoteDAO.GetDAO(b81)
-    count = 0
-    for ss, subject in enumerate(dao.get_subjects_list()):
-        BasicTui.Display(f'{ss}.> {subject}')
-        count += 1
-    BasicTui.Display(f"{count} Subjects.")
-    if count:
-        BasicTui.InputNumber("Number: ")
-        
-        
+    while True:
+        subjects = dao.get_subjects_list()
+        ss = 0; subject = None
+        for ss, subject in enumerate(subjects,1):
+            BasicTui.Display(f'{ss}.) {subject}')
+        BasicTui.Display(f"Found {ss} Subjects.")
+        if not ss:
+            return
+        which = BasicTui.InputNumber("Number: ")
+        if which < 1 or which > len(subjects):
+            BasicTui.DisplayError('Selection out of range.')
+            return
+        subject = subjects[which - 1]
+        option = BasicTui.Input('?, r, d, or q > ')
+        if not option: return
+        if option[0] == '?':
+            BasicTui.Display('? = Help (show this :-)')
+            BasicTui.Display('r = Rename Subject')       
+            BasicTui.Display('d = Delete Subject')
+            BasicTui.Display('q = Return to previous')
+            continue
+        if option[0] == 'd':
+            b = dao.subject_delete(subject)
+            if b:
+                print(f"Removed Subject '{subject}'")
+            else:
+                BasicTui.DisplayError(f"Error: Subject '{subject}' not deleted.")
+            continue
+        if option[0] == 'r':
+            nname = BasicTui.Input(f'Rename "{subject}" to: ')
+            b = dao.subject_rename(subject, nname)
+            if b:
+                print(f"Renamed Subject '{subject}'")
+            else:
+                BasicTui.DisplayError(f"Error: Subject '{subject}' not deleted.")
+            continue
+        return None
+
 
 def do_search_books():
     ''' Search books & read from results. '''
@@ -350,16 +380,7 @@ def show_verse(sierra):
     verse = dict(*dao.search_verse(sierra))
     BasicTui.DisplayVerse(verse)    
 
-## Unloved.
-##def do_search_stars():
-##    dao = FavDAO.GetDAO()
-##    count = 0
-##    for fav in dao.get_favs():
-##        count += 1
-##        show_verse(fav[0])
-##    BasicTui.DisplayTitle(f'There are {count} Stars.')
-
-   
+ 
 def do_user_report():
     dao = NoteDAO.GetDAO()
     count = 0
@@ -367,6 +388,78 @@ def do_user_report():
         count += 1
         show_verse(fav.vStart)
     BasicTui.DisplayTitle(f'There are {count} Notes.')
+
+
+def do_report_html():
+    from report_html import export_notes_to_html
+    export_notes_to_html()
+
+
+def do_help_notes_main():
+    BasicTui.Display('s: [Search]')
+    BasicTui.Display('Search all, either, or none to simply count words.')
+    BasicTui.Display('~~~~~')
+    BasicTui.Display('=: [Subjects]')
+    BasicTui.Display('Display all subjects (pages) created so far.')
+    BasicTui.Display('~~~~~')
+    BasicTui.Display('#: [Report]')
+    BasicTui.Display('Display the Note report.')
+    BasicTui.Display('~~~~~')
+    BasicTui.Display('$: [HTML Report]')
+    BasicTui.Display('The HTML Report is a great way to share your \
+notes, stars, and subjects with the rest of your world. Once exported \
+your subject groups will combine the topics you feel can be \
+presented together.')
+    BasicTui.Display('~~~~~')
+    BasicTui.Display('?: [Help]')
+    BasicTui.Display('Show this list.')
+    BasicTui.Display('~~~~~')
+    BasicTui.Display('q: [Quit]')
+    BasicTui.Display('Exit Notes.')
+    BasicTui.Display('~~~~~')    
+
+
+def notes_main():
+    ''' Seaching & working with our notes. '''
+    b81 = True
+    options = [
+        ("s", "Search", do_search_books),
+        ("=", "Subjects", do_search_subjects),
+        ("@", "Display Notes", do_user_report),
+        ("#", "Export HTML", do_report_html),
+        ("?", "Help", do_help_notes_main),
+        ("q", "Quit", dum)
+        ]
+    do_func("Option: ", options, '> Notes Menu')
+    BasicTui.Display(".")
+    
+
+def do_help_main():
+    ''' Explain the main options. '''
+    BasicTui.Display('b: [List Books]')
+    BasicTui.Display('List the names of all books in the "Stick of Joseph".')
+    BasicTui.Display('~~~~~')
+    BasicTui.Display('v: [ Sierra Reader]')
+    BasicTui.Display('Select a book to start reading by verse number.')
+    BasicTui.Display('~~~~~')
+    BasicTui.Display('c: [Classic Reader]')
+    BasicTui.Display("Select a book's number, chapter, and verse to start reading.")
+    BasicTui.Display('~~~~~')
+    BasicTui.Display('r: [Random Reader]')
+    BasicTui.Display('See what fate might have you read today?')
+    BasicTui.Display('~~~~~'),
+    BasicTui.Display('n: [Report]'),
+    BasicTui.Display('Notes & Searching.'),
+    BasicTui.Display('~~~~~')
+    BasicTui.Display('a: [Admin]')
+    BasicTui.Display('Data import, export, and backup.')
+    BasicTui.Display('~~~~~')
+    BasicTui.Display('?: [Help]')
+    BasicTui.Display('Show this list.')
+    BasicTui.Display('~~~~~')
+    BasicTui.Display('q: [Quit]')
+    BasicTui.Display('Program exit.')
+    BasicTui.Display('~~~~~')
 
 
 def mainloop():
@@ -377,10 +470,9 @@ def mainloop():
         ("v", "Sierra Reader", do_sierra_reader),
         ("c", "Classic Reader", do_classic_reader),
         ("r", "Random Reader", do_random_reader),
-        ("s", "Search", do_search_books),
-        ("=", "Subjects", do_search_subjects),
-        ("#", "Report", do_user_report),
+        ("n", "Notes", notes_main),
         ("a", "Admin", do_admin_ops),
+        ("?", "Help", do_help_main),
         ("q", "Quit", dum)
     ]
     BasicTui.SetTitle('The Stick of Joseph')

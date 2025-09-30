@@ -16,11 +16,6 @@ tables = {
     }
 
 
-def do_report_html():
-    from report_html import export_notes_to_html
-    export_notes_to_html()
-
-
 def do_export_user_data(prefix=None)->str:
     ''' Export user's NOTES and FAV's. File name returned. '''
     fname = time.strftime("%Y%m%d-%H%M%S") + '.sbbk'
@@ -236,12 +231,6 @@ def do_user_db_reset()->bool:
 
 
 def do_user_admin_help():
-    BasicTui.Display('#: [HTML Report]')
-    BasicTui.Display('The HTML Report is a great way to share your \
-notes, stars, and subjects with the rest of your world. Once exported \
-links to your subjects will allow quick access to topics you feel \
-can be presented together in a lesson.')
-    BasicTui.Display('~~~~~')
     BasicTui.Display('o: [Data Export]')
     BasicTui.Display('Export your notes, stars, and subjects to \
 an dated archive file name. A great way to save our work for later \
@@ -270,7 +259,6 @@ def do_admin_ops():
     from bible9000.main import do_func, dum
     ''' What users can do. '''
     options = [
-        ("#", "Notes Report", do_report_html),
         ("o", "Data Export", do_export_user_data),
         ("i", "Data Import", do_import_user_data),
         ("r", "Rename Data Export", do_rename_user_export),
