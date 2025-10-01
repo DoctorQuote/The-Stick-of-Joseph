@@ -25,8 +25,9 @@ The Stick of Joseph is forever a console user interface.
 From our pockets to the clouds ditching GUI's permits maximum - dare I say global - software re-use.
 
 ## Features & Function
-This first release offers:
+This 2nd release offers:
 
+* Fast-path menu operations. Enter *v.1.2.1.q* for an example.
 * Verse-Numbers to facilitate faster verse sharing.
 * Classic chapter-verse lookup to allow classic browsing.
 * Random verse browsing to allow infinite inspirations.
