@@ -1,7 +1,7 @@
 # The-Stick-of-Joseph
 Ancient Prophecy designed for Our Times - now available using [pip install Bible9000](https://pypi.org/project/Bible9000/)!
 
-The [video](https://youtu.be/4KU9m4emCo4?si=fW_7R4hjbsmY4JNO) shows how to use the program.
+The [video](https://youtube.com/shorts/pDHX4phEghs?feature=share) reviews key features and functions.
 
 ## Foreword
 Pure religion has nothing to do with me controlling you - it has to do with God, controlling me. (Romans 13:7 / #28274)
