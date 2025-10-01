@@ -9,9 +9,9 @@
 <button onclick="navigator.clipboard.writeText(document.getElementById('articleLink').value)">Copy Link</button>
 '''
 import sqlite3
-from sierra_dao  import SierraDAO
-from sierra_note import NoteDAO
-from sierra_fav  import FavDAO
+from bible9000.sierra_dao  import SierraDAO
+from bible9000.sierra_note import NoteDAO
+from bible9000.sierra_fav  import FavDAO
 
 HEADER = """<html>
 <head>

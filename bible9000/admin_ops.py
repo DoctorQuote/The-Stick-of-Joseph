@@ -5,8 +5,8 @@ if '..' not in sys.path:
 from bible9000.sierra_dao import SierraDAO
 from bible9000.tui        import BasicTui
 
-from sierra_note import NoteDAO
-from sierra_fav  import FavDAO
+from bible9000.sierra_note import NoteDAO
+from bible9000.sierra_fav  import FavDAO
 
 tables = {
     'SqlTblVerse':'CREATE TABLE IF NOT EXISTS SqlTblVerse (ID Integer PRIMARY KEY AUTOINCREMENT, BookID int, BookChapterID int, BookVerseID int, Verse String, VerseType int);',
@@ -179,8 +179,8 @@ def destroy_everything():
 
 
 def consolidate_notes():
-    from sierra_note import NoteDAO
-    from words import WordList
+    from bible9000.sierra_note import NoteDAO
+    from bible9000.words import WordList
     dao = NoteDAO.GetDAO(True)
     notes = dict()
     for note in dao.get_notes():

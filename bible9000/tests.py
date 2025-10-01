@@ -11,11 +11,11 @@ import sys
 if '..' not in sys.path:
     sys.path.append('..')
 
-from tui import BasicTui
-from sierra_dao import SierraDAO
-from sierra_note import NoteDAO
-from words import WordList
-from sierra_fav import FavDAO
+from bible9000.tui import BasicTui
+from bible9000.sierra_dao import SierraDAO
+from bible9000.sierra_note import NoteDAO
+from bible9000.words import WordList
+from bible9000.sierra_fav import FavDAO
 
 def test_dao():
     ''' Ye Olde Testing '''

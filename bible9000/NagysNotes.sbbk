@@ -1,0 +1,12 @@
+{'ID': 1, 'vStart': 15440, 'vEnd': 0, 'kwords': '', '_Subject': '', '_Notes': 'Same problem - different day :^)', 'NextId': 0, 'oid': 'NoteDAOv1'}
+{'ID': 2, 'vStart': 21414, 'vEnd': 0, 'kwords': '', '_Subject': '', '_Notes': "The ancients used to write on long sheets. Rolled into scrolls, it is easy to see how the word ''stick'' would be used to describe any book? One for each ''lost tribe''?", 'NextId': 0, 'oid': 'NoteDAOv1'}
+{'ID': 3, 'vStart': 21415, 'vEnd': 0, 'kwords': '', '_Subject': '', '_Notes': 'And now on our computers ... :^)', 'NextId': 0, 'oid': 'NoteDAOv1'}
+{'ID': 4, 'vStart': 21417, 'vEnd': 0, 'kwords': '', '_Subject': '', '_Notes': 'Ancient wisdom ... indeed!', 'NextId': 0, 'oid': 'NoteDAOv1'}
+{'ID': 5, 'vStart': 26498, 'vEnd': 0, 'kwords': '', '_Subject': '', '_Notes': "As plain a concept as 'ere could be ... ?", 'NextId': 0, 'oid': 'NoteDAOv1'}
+{'ID': 8, 'vStart': 36472, 'vEnd': 0, 'kwords': '', '_Subject': '', '_Notes': "If you knew of the 'stick prophecy' you'd surely be sure to say as much here ... for our benefit?", 'NextId': 0, 'oid': 'NoteDAOv1'}
+{'item': 15440, 'oid': 'FavDAOv1'}
+{'item': 21414, 'oid': 'FavDAOv1'}
+{'item': 21415, 'oid': 'FavDAOv1'}
+{'item': 21416, 'oid': 'FavDAOv1'}
+{'item': 21417, 'oid': 'FavDAOv1'}
+{'item': 36472, 'oid': 'FavDAOv1'}

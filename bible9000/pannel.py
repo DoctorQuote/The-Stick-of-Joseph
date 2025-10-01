@@ -1,9 +1,12 @@
 # License: MIT
 import textwrap
 
+STANDARD = 25
+NARROW   = 18
+
 class Panel:
 
-    def __init__(self, width=25, margin=2, initial_indent=' '):
+    def __init__(self, width=STANDARD, margin=1, initial_indent=' '):
         self._wrap = textwrap.TextWrapper()
         self._wrap.width = width
         self._margin = margin
