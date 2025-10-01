@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# License: MIT
 '''
 License: MIT
 File: main.py
@@ -34,6 +33,7 @@ from bible9000.sierra_note import NoteDAO
 from bible9000.sierra_fav  import FavDAO
 from bible9000.tui import BasicTui
 from bible9000.words import WordList
+from bible9000.fast_path import FastPath
 from bible9000.admin_ops import *
 
 BOOKS    = SierraDAO.GetTestaments()
@@ -53,6 +53,11 @@ def do_func(prompt, options, level=None):
         choice = BasicTui.Input(prompt)
         if not choice:
             continue
+        if choice.find('.') != -1:
+            FastPath.Setup(choice)
+            choice = FastPath.Pop()
+            if not choice:
+                continue
         choice = choice[0].lower()
         BasicTui.Display(f">> {choice}")
         for o in options:

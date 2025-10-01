@@ -1,5 +1,6 @@
 # License: MIT
 from bible9000.pannel import Panel
+from bible9000.fast_path import FastPath
 lwrap = Panel()
 
 class BasicTui:
@@ -28,12 +29,16 @@ class BasicTui:
     @staticmethod
     def Input(prompt:str)->str:
         ''' Great for regressive testing. '''
+        if FastPath.Len():
+            return FastPath.Pop()
         return input(prompt).strip()
     
     @staticmethod
     def InputNumber(prompt:str, default=-1)->str:
         ''' Get a number. Return the default on error. '''
         try:
+            if FastPath.Len():
+                return int(FastPath.Pop())
             return int(BasicTui.Input(prompt))
         except:
             return default
