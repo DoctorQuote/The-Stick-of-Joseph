@@ -29,12 +29,18 @@ From our pockets to the clouds ditching GUI's permits maximum - dare I say globa
 ## Features & Function
 This 2nd release offers:
 
+* New HTML report groups lesson subjects & notes together.
 * Fast-path menu operations. Enter *v.1.2.1.q* for an example.
+* Search all, one, or note of the Testaments.
+* Backup, reset, import & export lesson plans.
 * Verse-Numbers to facilitate faster verse sharing.
 * Classic chapter-verse lookup to allow classic browsing.
 * Random verse browsing to allow infinite inspirations.
 * Verse notation & reporting.
 * Verse "starring" & reporting.
+* Verses groupable by one or many subjects.
+* Global lesson / subject management.
+* Runs everywhere!
 
 # Running
 Once installed, to run the 'app, merely:
