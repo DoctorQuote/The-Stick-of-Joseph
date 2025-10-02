@@ -6,7 +6,7 @@ Problem Domain: Console Application
 '''
 
 STATUS   = "Production"
-VERSION  = "2.0.0"
+VERSION  = "2.0.1"
 MAX_FIND = 40 # When to enter 'tally only' mode
 
 '''
@@ -34,6 +34,7 @@ from bible9000.sierra_fav  import FavDAO
 from bible9000.tui import BasicTui
 from bible9000.words import WordList
 from bible9000.fast_path import FastPath
+from bible9000.report_html import export_notes_to_html
 from bible9000.admin_ops import *
 
 BOOKS    = SierraDAO.GetTestaments()
@@ -396,7 +397,6 @@ def do_user_report():
 
 
 def do_report_html():
-    from report_html import export_notes_to_html
     export_notes_to_html()
 
 

@@ -3,15 +3,18 @@
 # This is the big, beautiful, free book.
 # > Includes article tags!
 # > Includes article links!
+
 '''
 <!-- HTML expression for copying an article link to clipboard -->
 <input type="text" id="articleLink" value="https://example.com/your-article" readonly>
 <button onclick="navigator.clipboard.writeText(document.getElementById('articleLink').value)">Copy Link</button>
 '''
+import os, os.path
 import sqlite3
 from bible9000.sierra_dao  import SierraDAO
 from bible9000.sierra_note import NoteDAO
 from bible9000.sierra_fav  import FavDAO
+
 
 HEADER = """<html>
 <head>
@@ -145,7 +148,10 @@ def export_notes_to_html(output_html_file = 'MyNotes.html'):
 SqlTblVerse as e WHERE vStart == e.ID \
 ORDER BY e.ID;"))
         write_user_notes(output_html_file, authors_data)
-        print(f"HTML File '{output_html_file}' created.")
+        rfile = os.path.sep.join((
+            os.getcwd(),
+            output_html_file))
+        print(f"HTML File '{rfile}' created.")
 
     except sqlite3.Error as e:
         print(f"An SQLite error occurred: {e}")
