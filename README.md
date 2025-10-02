@@ -1,6 +1,8 @@
 # The-Stick-of-Joseph
 Ancient Prophecy designed for Our Times - now available using [pip install Bible9000](https://pypi.org/project/Bible9000/)!
 
+Version 2.0 allows verses to be grouped together using one or many "subjects." Easily managed as well as shared via the new HTML report. 
+
 The [video](https://youtube.com/shorts/pDHX4phEghs?feature=share) reviews key features and functions.
 
 ## Foreword
