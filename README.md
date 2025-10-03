@@ -5,7 +5,9 @@ Version 2.0 allows verses to be grouped together using one or many "subjects." E
 
 The [video](https://youtube.com/shorts/pDHX4phEghs?feature=share) reviews key features and functions.
 
-## Foreword
+We've also a very interesting (ever if I do say ...) [FastPath](https://www.youtube.com/shorts/_XdGfegEiEc) feature that you may be inspired to use in your own TUI-Taming 'Ops as well.
+
+## Dread-Not
 Pure religion has nothing to do with me controlling you - it has to do with God, controlling me. (Romans 13:7 / #28274)
 
 Adam, after all, was permitted to do whatever she did.
