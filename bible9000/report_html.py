@@ -9,7 +9,10 @@
 <input type="text" id="articleLink" value="https://example.com/your-article" readonly>
 <button onclick="navigator.clipboard.writeText(document.getElementById('articleLink').value)">Copy Link</button>
 '''
-import os, os.path
+import os, os.path, sys
+if '..' not in sys.path:
+    sys.path.append('..')
+
 import sqlite3
 from bible9000.sierra_dao  import SierraDAO
 from bible9000.sierra_note import NoteDAO
@@ -109,14 +112,14 @@ def write_user_notes(output_html_file, quotes):
     dreport[None] = list()
     for quote in quotes:
         qdict = dict(zip(FIELDS, quote))
-        for subject in subjects:
-            if not qdict['Subject']:
+        if not subjects:
                 # TODO: vNext ordering some day ...
                 dreport[None].append(qdict)
                 continue
+        for subject in subjects:
             if subject in qdict['Subject']:
                 # TODO: vNext ordering some day ...
-                dreport[subject].append(qdict)                
+                dreport[subject].append(qdict)               
     with open(output_html_file, 'w', encoding="utf8") as fh:
         print(HEADER, file=fh)
         if dreport:

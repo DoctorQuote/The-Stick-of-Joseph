@@ -37,8 +37,6 @@ class BasicTui:
     def InputNumber(prompt:str, default=-1)->str:
         ''' Get a number. Return the default on error. '''
         try:
-            if FastPath.Len():
-                return int(FastPath.Pop())
             return int(BasicTui.Input(prompt))
         except:
             return default
