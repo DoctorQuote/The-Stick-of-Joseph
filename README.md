@@ -31,7 +31,7 @@ From our pockets to the clouds ditching GUI's permits maximum - dare I say globa
 ## Features & Function
 This 2nd release offers:
 
-* New HTML report groups lesson subjects & notes together.
+* New HTML report groups lesson stars, subjects & notes together.
 * Fast-path menu operations. Enter *v.1.2.1.q* for an example.
 * Search all, one, or note of the Testaments.
 * Backup, reset, import & export lesson plans.
@@ -54,3 +54,7 @@ python3 -m bible9000
 Stay inspired!
 
 --- Doctor Randall 
+
+# p.s
+For those few who ain't afraid 'o no book then here's YOUR open invitation into enjoying some *far too personal* [Adventures in The Stick of Joseph](https://www.youtube.com/playlist?list=PLyE7r5UapthW5yfFy_N0dqjEsIk-tIhD5). (**WARNING:** *Leftist discression is advised!*)
+
