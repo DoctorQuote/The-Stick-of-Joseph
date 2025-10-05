@@ -87,6 +87,7 @@ class BasicTui:
     @staticmethod
     def DisplayVerse(row:dict)->bool:
         ''' Common display for all verses. '''
+        # TODO: Convert to UserSelects IFF.
         from bible9000.sierra_note import NoteDAO
         from bible9000.sierra_fav  import FavDAO
         if not row:

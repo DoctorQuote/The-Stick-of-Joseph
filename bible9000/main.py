@@ -6,7 +6,7 @@ Problem Domain: Console Application
 '''
 
 STATUS   = "Production"
-VERSION  = "2.0.1"
+VERSION  = "2.0.2"
 MAX_FIND = 40 # When to enter 'tally only' mode
 
 '''
@@ -35,6 +35,7 @@ from bible9000.tui import BasicTui
 from bible9000.words import WordList
 from bible9000.fast_path import FastPath
 from bible9000.report_html import export_notes_to_html
+from bible9000.user_selects import UserSelects
 from bible9000.admin_ops import *
 
 BOOKS    = SierraDAO.GetTestaments()
@@ -231,7 +232,6 @@ def do_classic_reader():
         browse_from(dict(res)['sierra'])
 
 
-
 def edit_notes(sierra, is_subject=False)->bool:
     ''' Manage the '.edit.' mode for any Sierra verse #. '''
     noun = 'Note'
@@ -388,12 +388,11 @@ def show_verse(sierra):
 
  
 def do_user_report():
-    dao = NoteDAO.GetDAO()
-    count = 0
-    for fav in dao.get_all():
-        count += 1
-        show_verse(fav.vStart)
-    BasicTui.DisplayTitle(f'There are {count} Notes.')
+    ''' Get all user notes & favs '''
+    verses = UserSelects.GetSelections()
+    for verse in verses:
+        show_verse(verse)
+    BasicTui.DisplayTitle(f'There are {len(verses)} Notes.')
 
 
 def do_report_html():

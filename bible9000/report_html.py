@@ -14,9 +14,8 @@ if '..' not in sys.path:
     sys.path.append('..')
 
 import sqlite3
-from bible9000.sierra_dao  import SierraDAO
-from bible9000.sierra_note import NoteDAO
-from bible9000.sierra_fav  import FavDAO
+from bible9000.user_selects  import UserSelects
+from bible9000.sierra_note   import NoteDAO
 
 
 HEADER = """<html>
@@ -76,26 +75,31 @@ FIELDS = ['uid','vStart','vEnd','kWords',
 
 # Define the paths for your input and output database files
 
-def __write_html(output_html_file, line, books, fh):
-    book = books[int(line['BookID'])-1]['book']
-    classic_ref = f" {book} {line['ChaptID']}:{line['VerseID']}"          
+def __write_html(output_html_file, quote, fh):
+    star = '&#127760;'
+    if quote.is_fav:
+        star = '&#127775;'
+    classic_ref = f" {quote.book} {quote.chapter}:{quote.verse}"          
     aref = f'<a href="{output_html_file}#\
-{line["uid"]}">&#127760;</a>'           
-    rec = f"<article id='{line['uid']}'>"
+{quote.sierra}">{star}</a>'           
+    rec = f"<article id='{quote.sierra}'>"
     rec += "<br><table width=450 border='1' cellpadding='10'>"
     rec += "<tr>"
     rec += "<td bgcolor='blue'>"
     rec += aref
+
     rec += f"&nbsp;<font color='yellow'>\
-Verse #{line['Sierra']}.</font>\
-<font color='gold'>{classic_ref}</font>\
-<br><font color='white'>{line['Notes']}</font>"
+    Verse #{quote.sierra}.</font>\
+    <font color='gold'>{classic_ref}</font>"
+
+    for znote in quote.notes:
+        rec += f"<br><font color='white'>{znote}</font>"
     rec += "</td>"
     rec += "</tr>"
     rec += "<tr>"
     rec += "<td bgcolor='gray' height='55px'>"
     rec += "<font size='3' color='yellow'>"
-    rec += line['Verse']
+    rec += quote.text
     rec += "</font>"
     rec += "</td>"
     rec += "</tr>"
@@ -104,22 +108,18 @@ Verse #{line['Sierra']}.</font>\
     print(rec, file=fh)
 
 def write_user_notes(output_html_file, quotes):
-    books = list(SierraDAO.ListBooks(True))
     subjects = NoteDAO.GetSubjects()
     dreport = dict()
     for s in subjects:
         dreport[s] = list()
     dreport[None] = list()
     for quote in quotes:
-        qdict = dict(zip(FIELDS, quote))
-        if not subjects:
-                # TODO: vNext ordering some day ...
-                dreport[None].append(qdict)
+        if not len(quote.subjects):
+                dreport[None].append(quote)
                 continue
-        for subject in subjects:
+        for subject in quote.subjects:
             if subject in qdict['Subject']:
-                # TODO: vNext ordering some day ...
-                dreport[subject].append(qdict)               
+                dreport[subject].append(quote)               
     with open(output_html_file, 'w', encoding="utf8") as fh:
         print(HEADER, file=fh)
         if dreport:
@@ -128,11 +128,11 @@ def write_user_notes(output_html_file, quotes):
                     print('<br><center><hr>General Subjects<br></center>',file=fh)
                 else:
                     print(f'<br><center><hr>{zkey}<br></center>',file=fh)
-                for tup in dreport[zkey]:
-                    __write_html(output_html_file, tup, books, fh)
+                for quote in dreport[zkey]:
+                    __write_html(output_html_file, quote, fh)
         else:
-            for tup in quotes:
-                __write_html(output_html_file, tup, books, fh)
+            for quote in quotes:
+                __write_html(output_html_file, quote, fh)
         print("<br><br><hr><hr><br></body>", file=fh)
         print("</html>", file=fh)
 
@@ -140,17 +140,11 @@ def write_user_notes(output_html_file, quotes):
 def export_notes_to_html(output_html_file = 'MyNotes.html'):
     ''' Generate lessons based upon SqlNotes. '''
     try:
-        # Connect to the source database
-        dao = SierraDAO.GetDAO()
         # Fix 'Could not decode to UTF-8 column' errors:
         # source_conn.text_factory = lambda b: b.decode('latin-1')
-
-        # Select data from the 'authors' table
-        authors_data = list(dao.conn.execute(
-            "SELECT * from SqlNotes JOIN \
-SqlTblVerse as e WHERE vStart == e.ID \
-ORDER BY e.ID;"))
-        write_user_notes(output_html_file, authors_data)
+        #
+        # Write data from the book's table:
+        write_user_notes(output_html_file, UserSelects.Get())
         rfile = os.path.sep.join((
             os.getcwd(),
             output_html_file))

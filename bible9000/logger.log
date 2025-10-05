@@ -27,3 +27,5 @@
 2025/10/01: 04.55.22 (LOCAL)	Implemented FastPath.
 2025/10/01: 05.08.46 (LOCAL)	Uploaded to GitHub.
 2025/10/01: 12.57.42 (LOCAL)	Rev 2.0.0 uploaded to PyPi.org
+2025/10/02: 12.11.59 (LOCAL)	Version 2.0.1 to PyPy and GitHub. (Reporting Fix / Update.)
+2025/10/05: 00.46.53 (LOCAL)	Stars were AWOL on HTML Report. Fixed.

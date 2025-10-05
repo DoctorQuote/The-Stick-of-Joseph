@@ -48,16 +48,6 @@ class FavDAO():
             if 'oid' in obj and obj['oid'] == 'FavDAOv1':
                 return FavDAO(tuple(obj.values()))
         return None
-            
-    @staticmethod
-    def GetDAO(bSaints=False, database=None):
-        ''' Connect to the database & return the DAO '''
-        if not database:
-            from bible9000.admin_ops import get_database
-            database = get_database()
-        result = FavDAO()
-        result.dao = SierraDAO.GetDAO(bSaints, database)
-        return result
     
     def toggle_fav(self, sierra)->bool:         
         if self.is_fav(sierra):
@@ -87,6 +77,23 @@ class FavDAO():
         except Exception as ex:
             BasicTui.DisplayError(ex)
         return None
+
+            
+    @staticmethod
+    def GetDAO(bSaints=False, database=None):
+        ''' Connect to the database & return the DAO '''
+        if not database:
+            from bible9000.admin_ops import get_database
+            database = get_database()
+        result = FavDAO()
+        result.dao = SierraDAO.GetDAO(bSaints, database)
+        return result
+
+
+    @staticmethod
+    def IsFav(sierra:int)->bool:
+        ''' JDI :) '''
+        return FavDAO.GetDAO(True).is_fav(sierra)
 
 
 if __name__ == '__main__':
