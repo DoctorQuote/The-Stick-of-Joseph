@@ -31,9 +31,10 @@ From our pockets to the clouds ditching GUI's permits maximum - dare I say globa
 ## Features & Function
 This 2nd release offers:
 
-* New HTML report groups lesson stars, subjects & notes together.
+* Single-number verse lookup. (*e.g. v.1.#*)
+* ew HTML report groups lesson stars, subjects & notes together.
 * Fast-path menu operations. Enter *v.1.2.1.q* for an example.
-* Search all, one, or note of the Testaments.
+* Search all, one, or none (i.e. *tally only*) of the Testaments.
 * Backup, reset, import & export lesson plans.
 * Verse-Numbers to facilitate faster verse sharing.
 * Classic chapter-verse lookup to allow classic browsing.
