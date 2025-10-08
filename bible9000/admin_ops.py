@@ -83,7 +83,7 @@ def do_rename_user_export()->bool:
         zname += '.sbbk'
     if os.path.exists(zname):
         BasicTui.Display(f'Whoops - {zname} already exists.')
-        op = BasicTui.Input(f'Ok to overwrite {zname}? y/N > ')
+        op = BasicTui.InputYesNo(f'Ok to overwrite {zname}? y/N > ')
         if not op or op[0] != 'y':
             BasicTui.Display(f'File {zname} not changed.')
             return False
@@ -212,7 +212,7 @@ def consolidate_notes():
 
 def do_user_db_reset()->bool:
     ''' Remove all user data. a bakcup_* file is created.'''
-    opt = BasicTui.Input('Remove custom content? y/N > ')
+    opt = BasicTui.InputYesNo('Remove custom content? y/N > ')
     if not opt or opt[0] != 'y':
         BasicTui.Display('Nothing removed.')
         return False

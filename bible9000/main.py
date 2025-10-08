@@ -6,7 +6,7 @@ Problem Domain: Console Application
 '''
 
 STATUS   = "Production"
-VERSION  = "2.0.2"
+VERSION  = "2.0.3"
 MAX_FIND = 40 # When to enter 'tally only' mode
 
 '''
@@ -55,11 +55,6 @@ def do_func(prompt, options, level=None):
         choice = BasicTui.Input(prompt)
         if not choice:
             continue
-        if choice.find('.') != -1:
-            FastPath.Setup(choice)
-            choice = FastPath.Pop()
-            if not choice:
-                continue
         choice = choice[0].lower()
         BasicTui.Display(f">> {choice}")
         for o in options:
@@ -84,7 +79,7 @@ def do_search_subjects():
             BasicTui.DisplayError('Selection out of range.')
             return
         subject = subjects[which - 1]
-        option = BasicTui.Input('?, r, d, or q > ')
+        option = BasicTui.InputOnly('?','r', 'd', 'q')
         if not option: return
         if option[0] == '?':
             BasicTui.Display('? = Help (show this :-)')
@@ -117,7 +112,7 @@ def do_search_books():
         BasicTui.Display("Example: +word -word, -a")
         BasicTui.Display("Enter q to quit")
         inc = ''; count = 0; exbook = {}
-        words = BasicTui.Input("?, +w, -w, q: ")
+        words = BasicTui.InputOnly("?", "+w", "-w", "q")
         cols = words.strip().split(' ')
         for word in cols:
             if not word or word == 'q':
@@ -255,7 +250,7 @@ def edit_notes(sierra, is_subject=False)->bool:
         return False
     znote = BasicTui.Input(f'{noun}: ')
     if not znote:
-        ok = BasicTui.Input(f'Delete {noun} (N/y) ?')
+        ok = BasicTui.InputYesNo(f'Delete {noun} (N/y) ?')
         if ok and ok.lower()[0] == 'y':
             notes.pop(inum)
         else:
@@ -331,7 +326,7 @@ def browse_from(sierra)->int:
         if not BasicTui.DisplayVerse(verse):
             return 0
         # do_func too much for a reader, methinks.
-        option = BasicTui.Input('?, *, @, =, n, p, [q]uit > ')
+        option = BasicTui.InputOnly('?', '*', '@', '=', 'n', 'p', '[q]uit')
         if not option:
             option = 'n'
         try:

@@ -80,10 +80,10 @@ WHERE (B.ID=BookID) AND BOOK LIKE '%{book}%' AND BookChapterID='{chapt}' AND Boo
     
     def search(self, where_clause):
         ''' Search using a LIKE-match - one or many. '''
-        cmd = self.sql_sel.replace('{zmatch}', where_clause)
-        res = self.conn.execute(cmd)
-        response = self.source()
         try:
+            cmd = self.sql_sel.replace('{zmatch}', where_clause)
+            res = self.conn.execute(cmd)
+            response = self.source()
             zrow = res.fetchone()
             while zrow:
                 response['sierra'] = str(zrow[4])

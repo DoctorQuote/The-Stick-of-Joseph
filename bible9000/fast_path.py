@@ -21,6 +21,15 @@ class FastPath:
         return None
 
     @staticmethod
+    def IsFastPath(option:str)->bool:
+        ''' Detect fast-path operations. '''
+        if not option: return False
+        for t in option.split('.'):
+            if len(t) != 1:
+                return False
+        return True
+
+    @staticmethod
     def Setup(path:str=''):
         ''' Set-up the command stack. '''
         FastPath._present = FastPath(path)

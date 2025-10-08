@@ -28,10 +28,14 @@ class BasicTui:
     
     @staticmethod
     def Input(prompt:str)->str:
-        ''' Great for regressive testing. '''
+        ''' Respect the fast path. '''
         if FastPath.Len():
             return FastPath.Pop()
-        return input(prompt).strip()
+        option = input(prompt).strip()
+        if FastPath.IsFastPath(option):
+            FastPath.Setup(option)
+            return FastPath.Pop()
+        return option
     
     @staticmethod
     def InputNumber(prompt:str, default=-1)->str:
@@ -40,6 +44,30 @@ class BasicTui:
             return int(BasicTui.Input(prompt))
         except:
             return default
+
+    @staticmethod
+    def InputYesNo(prompt:str)->str:
+        ''' Normalize y/n operations. '''
+        while True:
+            option = BasicTui.Input(prompt)
+            if option:
+                option = option.lower()
+                if option in ['y', 'n']:
+                    return option[0]
+            else:
+                BasicTui.DisplayError("Either 'y' or 'n' please.")
+
+    @staticmethod
+    def InputOnly(*args)->str:
+        ''' Enacpsulating sub-menu 'ops. '''
+        while True:
+            option = BasicTui.Input(f'{args} > ')
+            if FastPath.Len() or len(option) > 1:
+                return option
+            if option not in args:
+                BasicTui.DisplayError(f"Enter either {args}.")
+            else:
+                return option
     
     @staticmethod
     def DisplayTitle(title:str, char='*'):

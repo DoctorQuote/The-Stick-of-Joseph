@@ -34,7 +34,7 @@ class WordList:
             try:
                 for ss, l in enumerate(line,1):
                     BasicTui.Display(f'{ss}.) {l}')
-                opt = BasicTui.Input('?, -, +, q > ')
+                opt = BasicTui.InputOnly('?', '-', '+', 'q')
                 if not opt:
                     continue
                 if opt[0] == 'q':
