@@ -25,7 +25,7 @@ class FastPath:
         ''' Detect fast-path operations. '''
         if not option: return False
         for t in option.split('.'):
-            if len(t) != 1:
+            if t and t[0] in (' ','\t','\n'):
                 return False
         return True
 

@@ -326,7 +326,7 @@ def browse_from(sierra)->int:
         if not BasicTui.DisplayVerse(verse):
             return 0
         # do_func too much for a reader, methinks.
-        option = BasicTui.InputOnly('?', '*', '@', '=', 'n', 'p', '[q]uit')
+        option = BasicTui.InputOnly('?', '*', '@', '=', 'n', 'p', 'q')
         if not option:
             option = 'n'
         try:
